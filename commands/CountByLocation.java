@@ -2,7 +2,7 @@ package org.example.commands;
 
 import org.example.utils.CollectionManager;
 
-public class CountByLocation implements Commands{
+public class CountByLocation implements Command{
     private final CollectionManager collectionManager;
     public CountByLocation(CollectionManager collectionManager) {
         this.collectionManager = collectionManager;
