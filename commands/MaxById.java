@@ -3,7 +3,7 @@ package org.example.commands;
 import org.example.utils.CollectionManager;
 import org.example.collection.Person;
 
-public class MaxById implements Commands {
+public class MaxById implements Command {
     private final CollectionManager collectionManager;
 
     public MaxById(CollectionManager collectionManager) {
