@@ -3,7 +3,7 @@ package org.example.commands;
 import org.example.collection.Person;
 import org.example.utils.CollectionManager;
 
-public class RemoveById implements Commands{
+public class RemoveById implements Command{
     private final CollectionManager collectionManager;
 
     public RemoveById(CollectionManager collectionManager) {
