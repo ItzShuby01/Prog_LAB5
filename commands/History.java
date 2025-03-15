@@ -3,7 +3,7 @@ package org.example.commands;
 import org.example.utils.CollectionManager;
 import java.util.LinkedList;
 
-public class History implements Commands {
+public class History implements Command {
     private final LinkedList<String> commandHistory;
 
     public History(LinkedList<String> commandHistory) {
