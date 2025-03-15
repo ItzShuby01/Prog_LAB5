@@ -3,7 +3,7 @@ package org.example.commands;
 import org.example.collection.Person;
 import org.example.utils.CollectionManager;
 
-public class Update implements Commands{
+public class Update implements Command {
     private final CollectionManager collectionManager;
 
     public Update(CollectionManager collectionManager) {
