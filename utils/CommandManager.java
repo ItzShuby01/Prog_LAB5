@@ -2,117 +2,75 @@ package org.example.utils;
 
 import org.example.commands.*;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.function.Consumer;
 
+//This class Manages commands, their execution, and command history.
 public class CommandManager {
     private final CollectionManager collectionManager;
     private final LinkedList<String> commandHistory = new LinkedList<>();
+    private final HashMap<String, Consumer<String>> commandMap = new HashMap<>();
 
+    //Constructor for CommandManager  with reference to  CollectionManager.
     public CommandManager(CollectionManager collectionManager) {
         this.collectionManager = collectionManager;
+        initializeCommands();
     }
 
-    public void executeCommand(String command){
-        String[] commandArray = command.split(" ");
-        String c = commandArray[0];
-        String arg = "";
+    //Initializes all available commands and stores them in a map.
+    private void initializeCommands() {
+        commandMap.put("help", arg -> new Help().execute());
+        commandMap.put("exit", arg -> new Exit().execute());
+        commandMap.put("info", arg -> new Info(collectionManager).execute());
+        commandMap.put("show", arg -> new Show(collectionManager).execute());
+        commandMap.put("save", arg -> new Save(collectionManager).execute());
+        commandMap.put("add", arg -> new Add(collectionManager).execute());
+        commandMap.put("clear", arg -> new Clear(collectionManager).execute());
+        commandMap.put("history", arg -> new History(commandHistory).execute());
+        commandMap.put("max_by_id", arg -> new MaxById(collectionManager).execute());
+        commandMap.put("average_of_height", arg -> new AverageOfHeight(collectionManager).execute());
+        commandMap.put("add_if_max", arg -> new AddIfMax(collectionManager).execute());
 
-        if(commandArray.length == 2){
-            arg = commandArray[1];
+        // Adding commands that require arguments
+        commandMap.put("update", arg -> new Update(collectionManager).execute(arg));
+        commandMap.put("remove_by_id", arg -> new RemoveById(collectionManager).execute(arg));
+        commandMap.put("count_by_location", arg -> new CountByLocation(collectionManager).execute(arg));
+        commandMap.put("remove_lower", arg -> new RemoveLower(collectionManager).execute(arg));
+        commandMap.put("execute_script", this::readCommandsFromScript);
+    }
+
+      //Executes the given command by retrieving it from the command map.
+      //If the command is not found, it prints an error message.
+    public void executeCommand(String command) {
+        String[] commandArray = command.split(" ", 2);
+        String commandName = commandArray[0];
+        String arg = (commandArray.length == 2) ? commandArray[1] : "";
+
+        if (commandMap.containsKey(commandName)) {
+            commandMap.get(commandName).accept(arg);
+            addToHistory(commandName);
+        } else {
+            System.out.println("Command not found. Enter 'help' to see the manual");
         }
-
-        switch (c) {
-            case "help":
-                new Help().execute();
-                addToHistory(c);
-                break;
-            case "exit":
-                new Exit().execute();
-                addToHistory(c);
-                break;
-            case "info":
-                new Info(collectionManager).execute();
-                addToHistory(c);
-                break;
-            case "show":
-                new Show(collectionManager).execute();
-                addToHistory(c);
-                break;
-            case "save":
-                new Save(collectionManager).execute();
-                addToHistory(c);
-                break;
-            case "add":
-                new Add(collectionManager).execute();
-                addToHistory(c);
-                break;
-            case "clear":
-                new Clear(collectionManager).execute();
-                addToHistory(c);
-                break;
-            case "history":
-                new History(commandHistory).execute();
-                addToHistory(c);
-                break;
-            case "max_by_id":
-                new MaxById(collectionManager).execute();
-                addToHistory(c);
-                break;
-            case "average_of_height":
-                new AverageOfHeight(collectionManager).execute();
-                addToHistory(c);
-                break;
-            case "add_if_max":
-                new AddIfMax(collectionManager).execute();
-                addToHistory(c);
-                break;
-
-            //COMMANDS WITH ARGUMENTS
-            case "update":
-                new Update(collectionManager).execute(arg);
-                addToHistory(c);
-                break;
-            case "remove_by_id":
-                new RemoveById(collectionManager).execute(arg);
-                addToHistory(c);
-                break;
-            case "count_by_location":
-                new CountByLocation(collectionManager).execute(arg);
-                addToHistory(c);
-                break;
-            case "remove_lower":
-                new RemoveLower(collectionManager).execute(arg);
-                addToHistory(c);
-                break;
-            case "execute_script":
-                readCommandsFromScript(arg);
-                addToHistory(c);
-                break;
-            default:
-                System.out.println("Command not found. Enter 'help' to see the manual");
-        }
-
 
         System.out.println("////////////////////////////////////////////////////////////");
         System.out.println("\n");
     }
 
+    //Adds the commands (without arguments) to the command history.
     private void addToHistory(String commandName) {
-        // Keep only the last 7 commands.
         if (commandHistory.size() == 7) {
             commandHistory.removeFirst();
         }
         commandHistory.add(commandName);
     }
 
-    //method for 'EXECUTE_SCRIPT' command
-    private void readCommandsFromScript(String filePath){
+    //Reads and executes commands from a script file.
+    private void readCommandsFromScript(String filePath) {
         FileManager fileManager = new FileManager(collectionManager);
-        ArrayList<String> commands = fileManager.loadCommandsFromScript(filePath);
-
-        for (String command : commands) {
-            System.out.println("Executing command: " +command);
+        for (String command : fileManager.loadCommandsFromScript(filePath)) {
+            System.out.println("Executing command: " + command);
             executeCommand(command);
         }
     }
