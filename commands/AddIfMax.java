@@ -4,7 +4,7 @@ import org.example.utils.CollectionManager;
 import org.example.collection.Person;
 import java.util.Scanner;
 
-public class AddIfMax implements Commands {
+public class AddIfMax implements Command {
     private final CollectionManager collectionManager;
 
     public AddIfMax(CollectionManager collectionManager) {
