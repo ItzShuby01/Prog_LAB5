@@ -3,7 +3,7 @@ package org.example.commands;
 import org.example.utils.CollectionManager;
 import org.example.utils.FileManager;
 
-public class Save implements Commands{
+public class Save implements Command {
     private final CollectionManager collectionManager;
 
     public Save(CollectionManager collectionManager) {
