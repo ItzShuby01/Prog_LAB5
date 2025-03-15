@@ -1,7 +1,7 @@
 package org.example.commands;
 
 
-public class Help implements Commands{
+public class Help implements Command{
     @Override
     public void execute() {
         String manual = """
