@@ -1,6 +1,6 @@
 package org.example.commands;
 
-public class Exit implements Commands{
+public class Exit implements Command{
 
     @Override
     public void execute() {
