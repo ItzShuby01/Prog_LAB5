@@ -2,7 +2,7 @@ package org.example.commands;
 
 import org.example.utils.CollectionManager;
 
-public class AverageOfHeight implements Commands {
+public class AverageOfHeight implements Command {
     private final CollectionManager collectionManager;
 
     public AverageOfHeight(CollectionManager collectionManager) {
