@@ -2,7 +2,7 @@ package org.example.commands;
 
 import org.example.utils.CollectionManager;
 
-public class Show implements Commands{
+public class Show implements Command {
     private final CollectionManager collectionManager;
 
     public Show(CollectionManager collectionManager) {
