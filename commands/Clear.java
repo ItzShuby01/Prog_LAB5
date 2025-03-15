@@ -2,7 +2,7 @@ package org.example.commands;
 
 import org.example.utils.CollectionManager;
 
-public class Clear implements Commands{
+public class Clear implements Command{
     private final CollectionManager collectionManager;
 
     public Clear(CollectionManager collectionManager) {
