@@ -32,15 +32,17 @@ public class FileManager {
         return commands;
     }
 
-    public void loadCollectionFromXml(String filePath) {
+      public void loadCollectionFromXml(String filePath) {
         try {
             JAXBContext context = JAXBContext.newInstance(PersonList.class);
             Unmarshaller unmarshaller = context.createUnmarshaller();
 
             PersonList personList = (PersonList) unmarshaller.unmarshal(new File(filePath));
-
-            // Convert the list to a TreeSet (if needed) and update the collection
-            TreeSet<Person> loadedCollection = new TreeSet<>(personList.getPersons());
+            List<Person> persons = personList.getPersons();
+            if (persons == null) {
+                persons = new ArrayList<>();
+            }
+            TreeSet<Person> loadedCollection = new TreeSet<>(persons);
             collectionManager.setPersonTreeSet(loadedCollection);
             System.out.println("Collection loaded successfully!");
         } catch (JAXBException e) {
