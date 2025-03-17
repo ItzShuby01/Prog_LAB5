@@ -1,7 +1,5 @@
 package org.example.utils;
 
-
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -19,60 +17,67 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
-import java.util.Scanner;
 import java.util.TreeSet;
 
-@XmlRootElement(name = "sorted-set")
+@XmlRootElement(name = "sorted-Tree_set")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class CollectionManager {
     @XmlElement(name = "person")
     private final TreeSet<Person> personTreeSet = new TreeSet<>();
+
+
+    // Retrieve all 'Person' objects as a list
+    public List<Person> getAllPersons() {
+        return new ArrayList<>(personTreeSet);
+    }
+
+
+
+    private final IOService ioService;
+    // Constructor injection of IOService
+    public CollectionManager(ConsoleIOService ioService) {
+        this.ioService = ioService;
+    }
 
     public TreeSet<Person> getPersonTreeSet() {
         return personTreeSet;
     }
 
     public void setPersonTreeSet(TreeSet<Person> loadedCollection) {
-        if(loadedCollection != null) {
+        if (loadedCollection != null) {
             personTreeSet.clear();
             personTreeSet.addAll(loadedCollection);
         } else {
-            System.out.println("Warning: Attempted to load null collection");
+            ioService.print("Warning: Attempted to load null collection");
         }
     }
 
-
-    //Read person details from scanner without adding to collection
-    public Person readPersonFromScanner(Scanner scanner) {
+    // Read person details using IOService (for command 'add' or 'add_if_max')
+    public Person readPerson() {
         int id = generateId();
-        System.out.println("ID automatically generated: " + id);
+        ioService.print("ID automatically generated: " + id);
 
-        System.out.print("Enter person name: ");
-        String name = scanner.next();
-
-        Coordinates coordinates = addCoordinate(scanner);
-
+        String name = ioService.readLine("Enter person name: ");
+        Coordinates coordinates = addCoordinate();
         LocalDateTime creationDate = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("E, dd.MM.yyyy HH:mm:ss");
-        String formattedDate = creationDate.format(formatter);
-        System.out.println("Creation date was automatically generated: " + formattedDate);
-
-        double height = addHeight(scanner);
-        EyeColor eyeColor = addEyeColor(scanner);
-        HairColor hairColor = addHairColor(scanner);
-        Country nationality = addCountry(scanner);
-        Location location = addLocation(scanner);
+        ioService.print("Creation date was automatically generated: " + creationDate.format(formatter));
+        double height = addHeight();
+        EyeColor eyeColor = addEyeColor();
+        HairColor hairColor = addHairColor();
+        Country nationality = addCountry();
+        Location location = addLocation();
 
         return new Person(id, name, coordinates, creationDate, height, eyeColor, hairColor, nationality, location);
     }
 
-
-    //Methods to get the details of the 'Person'
+    // Helper methods used by readPerson() and other commands:
     private int generateId(){
         Random random = new Random();
         int id = random.nextInt(Integer.MAX_VALUE) + 1;
-        for(Person person : personTreeSet) {
+        for (Person person : personTreeSet) {
             while (person.getId() == id) {
                 id = random.nextInt(Integer.MAX_VALUE) + 1;
             }
@@ -80,173 +85,110 @@ public class CollectionManager {
         return id;
     }
 
-    private Coordinates addCoordinate(Scanner scanner) {
+    private Coordinates addCoordinate() {
         Coordinates coordinates = new Coordinates();
         boolean validInput = false;
-
         while (!validInput) {
             try {
-                System.out.println("Enter person coordinates");
-                System.out.print("x: ");
-                int x = scanner.nextInt();
-                if(x > 629) {
-                    throw new Exception("x exceed limits");
+                ioService.print("Enter person coordinates");
+                int x = ioService.readInt("x: ");
+                if (x > 629) {
+                    throw new Exception("x exceeds limits");
                 }
-
-                System.out.print("y: ");
-                double y = scanner.nextDouble();
-
+                double y = ioService.readDouble("y: ");
                 coordinates.setX(x);
                 coordinates.setY(y);
                 validInput = true;
             } catch (Exception e) {
-                System.out.println(e.getMessage());
-                System.out.println("Invalid formats. x is integer less than 630 and y is double");
-                scanner.nextLine();
+                ioService.print(e.getMessage());
+                ioService.print("Invalid formats. x must be an integer less than 630 and y a double.");
             }
         }
-
         return coordinates;
     }
 
-    private double addHeight(Scanner scanner){
-        double height = 0.0;
-        boolean validInput = false;
-        while (!validInput) {
-            try {
-                System.out.print("Enter person height: ");
-                height = scanner.nextDouble();
-                validInput = true;
-            } catch (Exception e) {
-                System.out.println("Invalid formats. height is double");
-                scanner.nextLine();
-            }
-        }
-        return height;
+    private double addHeight(){
+        return ioService.readDouble("Enter person height: ");
     }
 
-    private EyeColor addEyeColor(Scanner scanner) {
-        EyeColor eyeColor = null;
-        boolean validInput = false;
-
-        while (!validInput) {
+    private EyeColor addEyeColor() {
+        while (true) {
             try {
-                System.out.print("Enter person eye color: ");
-                String input = scanner.next().toUpperCase();
-                eyeColor = EyeColor.valueOf(input);
-                validInput = true;
+                String input = ioService.readLine("Enter person eye color: ").toUpperCase();
+                return EyeColor.valueOf(input);
             } catch (IllegalArgumentException e) {
-                System.out.println("Invalid input. Valid eye colors are RED, BLACK and ORANGE");
-                scanner.nextLine();
+                ioService.print("Invalid input. Valid eye colors are RED, BLACK, and ORANGE.");
             }
         }
-        return eyeColor;
     }
 
-    private HairColor addHairColor(Scanner scanner) {
-        HairColor hairColor = null;
-        boolean validInput = false;
-
-        while (!validInput) {
+    private HairColor addHairColor() {
+        while (true) {
             try {
-                System.out.print("Enter person hair color: ");
-                String input = scanner.next().toUpperCase();
-                hairColor = HairColor.valueOf(input);
-                validInput = true;
+                String input = ioService.readLine("Enter person hair color: ").toUpperCase();
+                return HairColor.valueOf(input);
             } catch (IllegalArgumentException e) {
-                System.out.println("Invalid input. Valid hair colors are GREEN, BLUE, YELLOW and BROWN");
-                scanner.nextLine();
+                ioService.print("Invalid input. Valid hair colors are GREEN, BLUE, YELLOW, and BROWN.");
             }
         }
-        return hairColor;
     }
 
-    private Country addCountry(Scanner scanner) {
-        Country country = null;
-        boolean validInput = false;
-
-        while (!validInput) {
+    private Country addCountry() {
+        while (true) {
             try {
-                System.out.print("Enter nationality: ");
-                String input = scanner.next().toUpperCase();
-                country = Country.valueOf(input);
-                validInput = true;
+                String input = ioService.readLine("Enter nationality: ").toUpperCase();
+                return Country.valueOf(input);
             } catch (IllegalArgumentException e) {
-                System.out.println("Invalid input. valid colors are RUSSIA, GERMANY, ITALY, THAILAND and JAPAN");
-                scanner.nextLine();
+                ioService.print("Invalid input. Valid options are RUSSIA, GERMANY, ITALY, THAILAND, and JAPAN.");
             }
         }
-        return country;
     }
 
-    private Location addLocation(Scanner scanner) {
+    private Location addLocation() {
         Location location = new Location();
         boolean validInput = false;
-
         while (!validInput) {
             try {
-                System.out.println("Enter person location");
-                System.out.print("x: ");
-                float x = scanner.nextFloat();
-                System.out.print("y: ");
-                Float y = scanner.nextFloat();
-                System.out.print("name: ");
-                String name = scanner.next();
-                if(name.length() > 530) {
-                    throw new Exception("length of name too long");
+                ioService.print("Enter person location");
+                float x = (float) ioService.readDouble("x: ");
+                float y = (float) ioService.readDouble("y: ");
+                String name = ioService.readLine("name: ");
+                if (name.length() > 530) {
+                    throw new Exception("Length of name too long");
                 }
-
                 location.setX(x);
                 location.setY(y);
                 location.setName(name);
                 validInput = true;
             } catch (Exception e) {
-                System.out.println("Invalid formats. x and y are float and name is string");
-                scanner.nextLine();
+                ioService.print("Invalid formats. x and y must be floats and name a string.");
             }
         }
-
         return location;
     }
 
-
-    //Helper method for adding person to collection ( For commands 'add' and 'add_if_max' )
+    // Helper method for adding a person to the collection (for 'add' and 'add_if_max' commands)
     public void add(Person person) {
         personTreeSet.add(person);
-        System.out.println(person.getName() + " has been added to the collection");
+        ioService.print(person.getName() + " has been added to the collection");
     }
 
-    //Helper method for 'ADD' command
+    // Command method for 'ADD'
     public void addPerson() {
-        Scanner scanner = new Scanner(System.in);
-        Person newPerson = readPersonFromScanner(scanner);
+        Person newPerson = readPerson();
         add(newPerson);
     }
 
-    //Helper method for 'UPDATE' command
-    public void updatePerson(Person person){
-        Scanner scanner = new Scanner(System.in);
-
-        //collect name
-        System.out.print("Enter name: ");
-        String name = scanner.next();
-
-        //collect coordinates
-        Coordinates coordinates = addCoordinate(scanner);
-        
-
-        System.out.println("Creation date cannot be changed");
-
-        //collect height
-        double height = addHeight(scanner);
-
-        //collect Eye color, hair color and country
-        EyeColor eyeColor = addEyeColor(scanner);
-        HairColor hairColor = addHairColor(scanner);
-        Country nationality = addCountry(scanner);
-
-        //collect location
-        Location location = addLocation(scanner);
+    // Command method for 'UPDATE'
+    public void updatePerson(Person person) {
+        String name = ioService.readLine("Enter name: ");
+        Coordinates coordinates = addCoordinate();
+        ioService.print("Creation date cannot be changed");
+        double height = addHeight();
+        EyeColor eyeColor = addEyeColor();
+        HairColor hairColor = addHairColor();
+        Country nationality = addCountry();
+        Location location = addLocation();
 
         person.setName(name);
         person.setCoordinates(coordinates);
@@ -256,49 +198,47 @@ public class CollectionManager {
         person.setNationality(nationality);
         person.setLocation(location);
 
-        System.out.println("Person with id " + person.getId() + " has been updated");
+        ioService.print("Person with id " + person.getId() + " has been updated");
     }
 
-    //Helper method for 'REMOVE_BY_ID' command
-    public void removePerson(Person person){
+    // Command method for 'REMOVE_BY_ID'
+    public void removePerson(Person person) {
         personTreeSet.remove(person);
     }
 
-    //Helper method for 'CLEAR COMMAND'
-    public void clear(){
+    // Command method for 'CLEAR'
+    public void clear() {
         ArrayList<Person> personList = new ArrayList<>(personTreeSet);
         personList.forEach(personTreeSet::remove);
-        System.out.println("Collection have been cleared");
+        ioService.print("Collection has been cleared");
     }
 
-    //Helper method for 'SHOW' command
-    public void show(){
-        if(personTreeSet.isEmpty()){
-            System.out.println("THE COLLECTION IS EMPTY");
+    // Command method for 'SHOW'
+    public void show() {
+        if (personTreeSet.isEmpty()) {
+            ioService.print("THE COLLECTION IS EMPTY");
         } else {
-            System.out.println("DISPLAYING THE COLLECTION DATA");
+            ioService.print("DISPLAYING THE COLLECTION DATA");
             for (Person person : personTreeSet) {
-                String eachPersonString = person.toString();
-                System.out.println(eachPersonString);
-                System.out.println();
+                ioService.print(person.toString());
+                ioService.print(""); // Print an empty line for spacing
             }
         }
-
     }
 
-    //Helper method for 'INFO' command
+    // Command method for 'INFO'
     public void info() {
-        System.out.println("Collection type: " + personTreeSet.getClass());
+        ioService.print("Collection type: " + personTreeSet.getClass());
         String initializationDate = getInitializationDate();
-        System.out.println("Initialization Date: " + initializationDate);
+        ioService.print("Initialization Date: " + initializationDate);
         int elementsCount = personTreeSet.size();
-        System.out.println("Number of persons: " + elementsCount);
+        ioService.print("Number of persons: " + elementsCount);
     }
-    //Helper method for the 'info' method
-    private String getInitializationDate(){
-        String date = "";
 
-        try{
+    // Helper for 'INFO' to get the initialization date from the storage file
+    private String getInitializationDate() {
+        String date = "";
+        try {
             Path path = Paths.get("storage.xml");
             BasicFileAttributes attributes = Files.readAttributes(path, BasicFileAttributes.class);
             FileTime fileTime = attributes.creationTime();
@@ -307,92 +247,81 @@ public class CollectionManager {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss");
             date = localDateTime.format(formatter);
         } catch (IOException e) {
-            System.out.println("EXCEPTION: " + e.getMessage());
+            ioService.print("EXCEPTION: " + e.getMessage());
         }
-
         return date;
     }
 
-    //Helper method for 'MAX_BY_ID' command
+    // Command method for 'MAX_BY_ID'
     public Person getMaxById() {
         return personTreeSet.isEmpty() ? null : personTreeSet.last();
     }
 
-    //Helper method for 'AVERAGE_OF_HEIGHT' command
-    public void printAverageHeight(){
+    // Command method for 'AVERAGE_OF_HEIGHT'
+    public void printAverageHeight() {
         if (personTreeSet.isEmpty()) {
-            System.out.println("Collection is empty");
+            ioService.print("Collection is empty");
             return;
         }
-
         double averageHeight = personTreeSet.stream()
                 .mapToDouble(Person::getHeight)
                 .average()
                 .orElse(0.0);
-
-        System.out.printf("Average height: %.2f%n", averageHeight);
+        ioService.print(String.format("Average height: %.2f", averageHeight));
     }
 
-    //Helper method for 'COUNT_BY_LOCATION' command
-    public int countByLocation(String location){
+    // Command method for 'COUNT_BY_LOCATION'
+    public int countByLocation(String locationName) {
         int count = 0;
-        for(Person person : personTreeSet){
-            if(person.getLocation().getName().equalsIgnoreCase(location)) {
+        for (Person person : personTreeSet) {
+            if (person.getLocation().getName().equalsIgnoreCase(locationName)) {
                 count++;
             }
         }
-
         return count;
     }
 
-    //Helper method for 'REMOVE_LOWER' command
-    public void removeLower(String idString){
-        try{
+    // Command method for 'REMOVE_LOWER'
+    public void removeLower(String idString) {
+        try {
             int inputtedId = Integer.parseInt(idString);
             ArrayList<Person> toRemove = new ArrayList<>();
-            Person personWithId = new Person();
+            Person personWithId = null;
             int position = 0;
-
             for (Person person : personTreeSet) {
-                position += 1;
-                if(person.getId() == inputtedId) {
+                position++;
+                if (person.getId() == inputtedId) {
                     personWithId = person;
                     break;
                 }
             }
-            System.out.println(position);
-            if(personWithId.getId() == null) {
-                System.out.println("No person in collection exists with ID " + inputtedId);
+            ioService.print("Position: " + position);
+            if (personWithId == null) {
+                ioService.print("No person in collection exists with ID " + inputtedId);
                 return;
             }
-
             for (Person person : personTreeSet) {
-                if(personWithId.getId() > person.getId()) {
+                if (personWithId.getId() > person.getId()) {
                     toRemove.add(person);
                 }
             }
-
-            if(toRemove.isEmpty()){
-                System.out.println("Person with id " + inputtedId + " is the lowest");
-            } else{
+            if (toRemove.isEmpty()) {
+                ioService.print("Person with id " + inputtedId + " is the lowest");
+            } else {
                 toRemove.forEach(personTreeSet::remove);
-                System.out.println("Removed all elements lower");
+                ioService.print("Removed all elements lower");
             }
-
-
         } catch (RuntimeException e) {
-            System.out.println(e.getMessage());
-            System.out.println("ID must be an integer");
+            ioService.print(e.getMessage());
+            ioService.print("ID must be an integer");
         }
     }
 
-    //Get max height from collection to compare with new person and trigger 'add if max' command
+    // Command method for 'GET_MAX_HEIGHT'
     public double getMaxHeight() {
         return personTreeSet.stream()
                 .mapToDouble(Person::getHeight)
                 .max()
                 .orElse(0.0);
     }
-
-
 }
