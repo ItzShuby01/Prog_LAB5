@@ -8,7 +8,8 @@ public class Main {
 
     public static void main(String[] args) {
         try{
-            CollectionManager collectionManager = new CollectionManager();
+            ConsoleIOService ioService = new ConsoleIOService();
+            CollectionManager collectionManager = new CollectionManager(ioService);
             FileManager fileManager = new FileManager(collectionManager);
 
             //setting environmental variables.
