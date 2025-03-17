@@ -235,16 +235,19 @@ public class CollectionManager {
         ioService.print("Number of persons: " + elementsCount);
     }
 
-    // Helper for 'INFO' to get the initialization date from the storage file
+   // Helper for 'INFO' to get the initialization date from the storage file
     private String getInitializationDate() {
         String date = "";
+        String path = System.getenv("COLLECTION_FILE_PATH");
+        if (path == null) {
+            return "Initialization date not available because the environmental variable is not set";
+        }
         try {
-            String path = System.getenv("COLLECTION_PATH_FILE");
             BasicFileAttributes attributes = Files.readAttributes(Path.of(path), BasicFileAttributes.class);
             FileTime fileTime = attributes.creationTime();
             Instant instant = fileTime.toInstant();
             LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss");
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("E, dd.MM.yyyy HH:mm:ss");
             date = localDateTime.format(formatter);
         } catch (IOException e) {
             ioService.print("EXCEPTION: " + e.getMessage());
