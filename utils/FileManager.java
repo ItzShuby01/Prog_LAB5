@@ -5,6 +5,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import org.example.collection.Person;
+import org.example.collection.PersonList;
 
 
 import java.io.*;
@@ -33,37 +34,34 @@ public class FileManager {
 
     public void loadCollectionFromXml(String filePath) {
         try {
-            // Create a JAXB context for PersonCollection class
-            JAXBContext context = JAXBContext.newInstance(CollectionManager.class);
+            JAXBContext context = JAXBContext.newInstance(PersonList.class);
             Unmarshaller unmarshaller = context.createUnmarshaller();
 
-            // Deserialize from XML file
-            CollectionManager collection = (CollectionManager) unmarshaller.unmarshal(new File(filePath));
+            PersonList personList = (PersonList) unmarshaller.unmarshal(new File(filePath));
 
-            // Get the TreeSet of Persons
-            TreeSet<Person> loadedCollection = collection.getPersonTreeSet();
+            // Convert the list to a TreeSet (if needed) and update the collection
+            TreeSet<Person> loadedCollection = new TreeSet<>(personList.getPersons());
             collectionManager.setPersonTreeSet(loadedCollection);
             System.out.println("Collection loaded successfully!");
         } catch (JAXBException e) {
             System.out.println("Error loading collection: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
     public void saveCollectionToXml(String filePath) {
         try {
-            // Create JAXB context for the CollectionManager class
-            JAXBContext context = JAXBContext.newInstance(CollectionManager.class);
+            JAXBContext context = JAXBContext.newInstance(PersonList.class);
             Marshaller marshaller = context.createMarshaller();
-
-            // Format the output for better readability
             marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
 
-            // Marshal the CollectionManager object to XML and save it to the file
-            marshaller.marshal(collectionManager, new File(filePath));
-
-            System.out.println("Collection saved to " + filePath);
-        } catch (JAXBException e) {
+            PersonList personList = new PersonList(collectionManager.getAllPersons());
+            marshaller.marshal(personList, new File(filePath));
+            System.out.println("Collection saved successfully!");
+        } catch (Exception e) {
             System.out.println("Error saving collection: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 }
+
