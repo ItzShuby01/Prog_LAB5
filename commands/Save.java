@@ -14,7 +14,7 @@ public class Save implements Command {
     @Override
     public void execute() {
         FileManager fileManager = new FileManager(collectionManager);
-        String filePath = "storage.xml";
+        String filePath = System.getenv("COLLECTION_FILE_PATH");
         fileManager.saveCollectionToXml(filePath);
     }
 
