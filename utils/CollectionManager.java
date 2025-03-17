@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.TreeSet;
 
-@XmlRootElement(name = "sorted-Tree_set")
+@XmlRootElement(name = "persons")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class CollectionManager {
     @XmlElement(name = "person")
