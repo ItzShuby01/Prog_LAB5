@@ -46,10 +46,6 @@ public class Person implements Comparable<Person>{
         return id;
     }
 
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
     public String getName() {
         return name;
     }
@@ -58,20 +54,8 @@ public class Person implements Comparable<Person>{
         this.name = name;
     }
 
-    public Coordinates getCoordinates() {
-        return coordinates;
-    }
-
     public void setCoordinates(Coordinates coordinates) {
         this.coordinates = coordinates;
-    }
-
-    public LocalDateTime getCreationDate() {
-        return creationDate;
-    }
-
-    public void setCreationDate(LocalDateTime creationDate) {
-        this.creationDate = creationDate;
     }
 
     public double getHeight() {
@@ -82,24 +66,13 @@ public class Person implements Comparable<Person>{
         this.height = height;
     }
 
-    public EyeColor getEyeColor() {
-        return eyeColor;
-    }
-
     public void setEyeColor(EyeColor eyeColor) {
         this.eyeColor = eyeColor;
     }
 
-    public HairColor getHairColor() {
-        return hairColor;
-    }
 
     public void setHairColor(HairColor hairColor) {
         this.hairColor = hairColor;
-    }
-
-    public Country getNationality() {
-        return nationality;
     }
 
     public void setNationality(Country nationality) {
