@@ -239,8 +239,8 @@ public class CollectionManager {
     private String getInitializationDate() {
         String date = "";
         try {
-            Path path = Paths.get("storage.xml");
-            BasicFileAttributes attributes = Files.readAttributes(path, BasicFileAttributes.class);
+            String path = System.getenv("COLLECTION_PATH_FILE");
+            BasicFileAttributes attributes = Files.readAttributes(Path.of(path), BasicFileAttributes.class);
             FileTime fileTime = attributes.creationTime();
             Instant instant = fileTime.toInstant();
             LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
