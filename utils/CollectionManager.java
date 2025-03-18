@@ -1,15 +1,11 @@
 package org.example.utils;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
+
 import org.example.collection.*;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
 import java.time.Instant;
@@ -21,10 +17,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.TreeSet;
 
-@XmlRootElement(name = "persons")
-@XmlAccessorType(XmlAccessType.FIELD)
 public class CollectionManager {
-    @XmlElement(name = "person")
     private final TreeSet<Person> personTreeSet = new TreeSet<>();
 
 
@@ -235,7 +228,7 @@ public class CollectionManager {
         ioService.print("Number of persons: " + elementsCount);
     }
 
-   // Helper for 'INFO' to get the initialization date from the storage file
+    // Helper for 'INFO' to get the initialization date from the storage file
     private String getInitializationDate() {
         String date = "";
         String path = System.getenv("COLLECTION_FILE_PATH");
