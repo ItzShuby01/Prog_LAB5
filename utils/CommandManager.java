@@ -9,19 +9,21 @@ import java.util.function.Consumer;
 //This class Manages commands, their execution, and command history.
 public class CommandManager {
     private final CollectionManager collectionManager;
+    private final ConsoleManager consoleManager;
     private final LinkedList<String> commandHistory = new LinkedList<>();
     private final HashMap<String, Consumer<String>> commandMap = new HashMap<>();
 
     //Constructor for CommandManager  with reference to  CollectionManager.
-    public CommandManager(CollectionManager collectionManager) {
+    public CommandManager(CollectionManager collectionManager, ConsoleManager consoleManager) {
         this.collectionManager = collectionManager;
+        this.consoleManager = consoleManager;
         initializeCommands();
     }
 
-    //Initializes all available commands and stores them in a map.
+    //Initializes all available commands and stores them in a Command map.
     private void initializeCommands() {
         commandMap.put("help", arg -> new Help().execute());
-        commandMap.put("exit", arg -> new Exit().execute());
+        commandMap.put("exit", arg -> new Exit(consoleManager).execute());
         commandMap.put("info", arg -> new Info(collectionManager).execute());
         commandMap.put("show", arg -> new Show(collectionManager).execute());
         commandMap.put("save", arg -> new Save(collectionManager).execute());
