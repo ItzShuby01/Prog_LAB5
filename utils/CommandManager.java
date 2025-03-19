@@ -2,8 +2,7 @@ package org.example.utils;
 
 import org.example.commands.*;
 
-import java.util.HashMap;
-import java.util.LinkedList;
+import java.util.*;
 import java.util.function.Consumer;
 
 //This class Manages commands, their execution, and command history.
@@ -12,6 +11,7 @@ public class CommandManager {
     private final ConsoleManager consoleManager;
     private final LinkedList<String> commandHistory = new LinkedList<>();
     private final HashMap<String, Consumer<String>> commandMap = new HashMap<>();
+    private final Set<String> argumentRequiredCommands = new HashSet<>();
 
     //Constructor for CommandManager  with reference to  CollectionManager.
     public CommandManager(CollectionManager collectionManager, ConsoleManager consoleManager) {
@@ -20,8 +20,16 @@ public class CommandManager {
         initializeCommands();
     }
 
-    //Initializes all available commands and stores them in a Command map.
+
     private void initializeCommands() {
+       //make sure commands that require arguments are passed arguments
+        argumentRequiredCommands.add("update");
+        argumentRequiredCommands.add("remove_by_id");
+        argumentRequiredCommands.add("count_by_location");
+        argumentRequiredCommands.add("remove_lower");
+        argumentRequiredCommands.add("execute_script");
+
+        //Initializes all available commands and stores them in a Command map.
         commandMap.put("help", arg -> new Help().execute());
         commandMap.put("exit", arg -> new Exit(consoleManager).execute());
         commandMap.put("info", arg -> new Info(collectionManager).execute());
@@ -44,22 +52,34 @@ public class CommandManager {
 
       //Executes the given command by retrieving it from the command map.
       //If the command is not found, it prints an error message.
-    public void executeCommand(String command) {
-        String[] commandArray = command.split(" ", 2);
-        String commandName = commandArray[0];
-        String arg = (commandArray.length == 2) ? commandArray[1] : "";
+      public void executeCommand(String command) {
+          String[] commandArray = command.split(" ", 2);
+          String commandName = commandArray[0];
+          String arg = (commandArray.length == 2) ? commandArray[1] : "";
 
-        if (commandMap.containsKey(commandName)) {
-            commandMap.get(commandName).accept(arg);
-            addToHistory(commandName);
-        } else {
-            System.out.println("Command not found. Enter 'help' to see the manual");
-        }
+          if (commandMap.containsKey(commandName)) {
+              // Check argument requirements
+              if (argumentRequiredCommands.contains(commandName)) {
+                  if (arg.isEmpty()) {
+                      System.out.println("Error: Command '" + commandName + "' requires an argument.");
+                      return; 
+                  }
+              } else {
+                  if (!arg.isEmpty()) {
+                      System.out.println("Error: Command '" + commandName + "' does not take an argument.");
+                      return; 
+                  }
+              }
 
-        System.out.println("////////////////////////////////////////////////////////////");
-        System.out.println("\n");
-    }
+              // Execute command if valid
+              commandMap.get(commandName).accept(arg);
+              addToHistory(commandName);
+          } else {
+              System.out.println("Command not found. Enter 'help' to see the manual");
+          }
 
+          System.out.println("////////////////////////////////////////////////////////////\n");
+      }
     //Adds the commands (without arguments) to the command history.
     private void addToHistory(String commandName) {
         if (commandHistory.size() == 7) {
