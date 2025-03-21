@@ -1,7 +1,9 @@
 package org.example.utils;
 
+import org.example.collection.*;
 import org.example.commands.*;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Consumer;
 
@@ -46,7 +48,7 @@ public class CommandManager {
         commandMap.put("save", arg -> new Save(collectionManager).execute());
         commandDescriptionMap.put("save", "save: save collection to file");
 
-        commandMap.put("add", arg -> new Add(collectionManager).execute());
+        commandMap.put("add", arg -> new Add(collectionManager).execute(arg));
         commandDescriptionMap.put("add", "add {element}: add a new item to the collection");
 
         commandMap.put("clear", arg -> new Clear(collectionManager).execute());
@@ -100,29 +102,26 @@ public class CommandManager {
           String arg = (commandArray.length == 2) ? commandArray[1] : "";
 
           if (commandMap.containsKey(commandName)) {
-              // Check argument requirements
+              // Skip argument checks for "add" in interactive mode
               if (argumentRequiredCommands.contains(commandName)) {
                   if (arg.isEmpty()) {
                       System.out.println("Error: Command '" + commandName + "' requires an argument.");
                       return;
                   }
               } else {
+                  // Allow "add" to execute without arguments (interactive mode)
                   if (!arg.isEmpty()) {
                       System.out.println("Error: Command '" + commandName + "' does not take an argument.");
                       return;
                   }
               }
 
-              // Execute command if valid
               commandMap.get(commandName).accept(arg);
               addToHistory(commandName);
           } else {
               System.out.println("Command not found. Enter 'help' to see the manual");
           }
-
-          System.out.println("////////////////////////////////////////////////////////////\n");
-      }
-    //Adds the commands (without arguments) to the command history.
+      }    //Adds the commands (without arguments) to the command history.
     private void addToHistory(String commandName) {
         if (commandHistory.size() == 7) {
             commandHistory.removeFirst();
@@ -134,9 +133,15 @@ public class CommandManager {
     private void readCommandsFromScript(String filePath) {
         FileManager fileManager = new FileManager(collectionManager);
         for (String command : fileManager.loadCommandsFromScript(filePath)) {
-            System.out.println("Executing command: " + command);
-            executeCommand(command);
-        }
-    }
+            String[] parts = command.split(" ", 2); // Split into command name and arguments
+            String commandName = parts[0];
+            String arg = parts.length > 1 ? parts[1] : "";
 
-}
+            if (commandMap.containsKey(commandName)) {
+                commandMap.get(commandName).accept(arg); // Execute directly
+                addToHistory(commandName);
+            } else {
+                System.out.println("Command not found: " + commandName);
+            }
+        }
+    }}
