@@ -3,7 +3,7 @@ package org.example.commands;
 import org.example.commands.Commands;
 import org.example.utils.ConsoleManager;
 
-public class Exit implements Commands {
+public class Exit implements Command {
     private final ConsoleManager consoleManager;
 
     public Exit(ConsoleManager consoleManager) {
