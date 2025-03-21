@@ -2,7 +2,7 @@ package org.example.commands;
 
 import org.example.utils.CommandManager;
 
-public class Help implements Commands {
+public class Help implements Command {
     private final CommandManager commandManager;
 
     // Accept CommandManager in the constructor
