@@ -39,4 +39,9 @@ public class ConsoleIOService implements IOService {
             }
         }
     }
+
+    @Override
+    public void close() {
+        scanner.close();
+    }
 }
