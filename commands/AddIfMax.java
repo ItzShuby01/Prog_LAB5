@@ -2,7 +2,6 @@ package org.example.commands;
 
 import org.example.utils.CollectionManager;
 import org.example.collection.Person;
-import java.util.Scanner;
 
 public class AddIfMax implements Command {
     private final CollectionManager collectionManager;
@@ -13,9 +12,8 @@ public class AddIfMax implements Command {
 
     @Override
     public void execute() {
-        Scanner scanner = new Scanner(System.in);
         System.out.println("Creating a new person to check if it's the max by height...");
-        Person newPerson = collectionManager.readPersonFromScanner(scanner);
+        Person newPerson = collectionManager.readPerson();
         double currentMaxHeight = collectionManager.getMaxHeight();
 
         if (newPerson.getHeight() > currentMaxHeight) {
