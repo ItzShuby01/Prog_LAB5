@@ -1,6 +1,5 @@
 package org.example.commands;
 
-import org.example.commands.Commands;
 import org.example.utils.ConsoleManager;
 
 public class Exit implements Command {
@@ -12,12 +11,10 @@ public class Exit implements Command {
 
     @Override
     public void execute() {
-        System.out.println("Exiting the app. See you later!");
+        System.out.println("Exiting the app. See you again later!!!");
         consoleManager.stop();
     }
 
     @Override
-    public void execute(String arg) {
-        execute();
-    }
+    public void execute(String arg) {}
 }
