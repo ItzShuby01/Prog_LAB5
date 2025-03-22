@@ -16,29 +16,46 @@ public class ConsoleIOService implements IOService {
         return scanner.nextLine();
     }
 
+
     @Override
     public int readInt(String prompt) {
-        while (true) {
+        int number=0;
+        boolean validInput = false;
+
+        do {
+            print(prompt);
+            String input = scanner.nextLine();
+
             try {
-                print(prompt);
-                return Integer.parseInt(scanner.nextLine());
+                number = Integer.parseInt(input);
+                validInput = true; // Exit condition
             } catch (NumberFormatException e) {
                 print("Invalid input. Please enter a valid integer.");
             }
-        }
+        } while (!validInput);
+
+        return number;
     }
 
     @Override
     public double readDouble(String prompt) {
-        while (true) {
+        double number=0;
+        boolean validInput = false;
+
+        do {
+            print(prompt);
+            String input = scanner.nextLine();
             try {
-                print(prompt);
-                return Double.parseDouble(scanner.nextLine());
+                number = Double.parseDouble(input);
+                validInput = true;
             } catch (NumberFormatException e) {
                 print("Invalid input. Please enter a valid double.");
             }
-        }
+        } while (!validInput);
+
+        return number;
     }
+
 
     @Override
     public void close() {
