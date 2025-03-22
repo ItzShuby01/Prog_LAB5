@@ -6,8 +6,7 @@ public class Main {
 
 
     public static void main(String[] args) {
-        try{
-            ConsoleIOService ioService = new ConsoleIOService();
+        try(ConsoleIOService ioService = new ConsoleIOService()){
             CollectionManager collectionManager = new CollectionManager(ioService);
             FileManager fileManager = new FileManager(collectionManager);
 
