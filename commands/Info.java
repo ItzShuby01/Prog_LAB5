@@ -13,9 +13,4 @@ public class Info implements Command {
     public void execute() {
         collectionManager.info();
     }
-
-    @Override
-    public void execute(String arg) {
-
-    }
 }
