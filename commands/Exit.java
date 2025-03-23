@@ -14,7 +14,4 @@ public class Exit implements Command {
         System.out.println("Exiting the app. See you again later!!!");
         consoleManager.stop();
     }
-
-    @Override
-    public void execute(String arg) {}
 }
