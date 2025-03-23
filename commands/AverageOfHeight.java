@@ -13,9 +13,4 @@ public class AverageOfHeight implements Command {
     public void execute() {
         collectionManager.printAverageHeight();
     }
-
-    @Override
-    public void execute(String arg) {
-
-    }
 }
