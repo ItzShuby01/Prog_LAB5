@@ -11,11 +11,6 @@ public class Update implements Command {
     }
 
     @Override
-    public void execute() {
-
-    }
-
-    @Override
     public void execute(String arg) {
         try{
             int id = Integer.parseInt(arg);
