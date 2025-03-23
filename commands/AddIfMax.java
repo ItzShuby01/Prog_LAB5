@@ -23,7 +23,4 @@ public class AddIfMax implements Command {
             System.out.println("New person's height is not greater than the current maximum. Not added to collection.");
         }
     }
-
-    @Override
-    public void execute(String arg) {}
 }
