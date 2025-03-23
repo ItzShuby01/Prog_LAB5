@@ -18,10 +18,4 @@ public class History implements Command {
         }
     }
 
-    @Override
-    public void execute(String arg) {
-
-    }
-
-
 }
