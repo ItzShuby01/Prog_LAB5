@@ -20,8 +20,4 @@ public class MaxById implements Command {
         }
     }
 
-    @Override
-    public void execute(String arg) {
-
-    }
 }
