@@ -10,11 +10,6 @@ public class RemoveLower implements Command {
     }
 
     @Override
-    public void execute() {
-
-    }
-
-    @Override
     public void execute(String arg) {
         collectionManager.removeLower(arg);
     }
