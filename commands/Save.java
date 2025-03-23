@@ -17,9 +17,4 @@ public class Save implements Command {
         String filePath = System.getenv("COLLECTION_FILE_PATH");
         fileManager.saveCollectionToXml(filePath);
     }
-
-    @Override
-    public void execute(String arg) {
-
-    }
 }
