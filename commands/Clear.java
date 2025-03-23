@@ -13,9 +13,4 @@ public class Clear implements Command{
     public void execute() {
         collectionManager.clear();
     }
-
-    @Override
-    public void execute(String arg) {
-
-    }
 }
