@@ -13,9 +13,4 @@ public class Show implements Command {
     public void execute() {
         collectionManager.show();
     }
-
-    @Override
-    public void execute(String arg) {
-
-    }
 }
