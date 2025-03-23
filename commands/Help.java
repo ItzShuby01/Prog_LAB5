@@ -19,8 +19,4 @@ public class Help implements Command {
         );
         System.out.println(manual);
     }
-
-    @Override
-    public void execute(String arg) {
-    }
 }
