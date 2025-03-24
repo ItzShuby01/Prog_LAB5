@@ -5,14 +5,15 @@ import org.example.utils.CommandManager;
 public class Help implements Command {
     private final CommandManager commandManager;
 
-    // Accept CommandManager in the constructor
+
+
     public Help(CommandManager commandManager) {
         this.commandManager = commandManager;
     }
 
     @Override
     public void execute() {
-        // Dynamically generate help message from CommandManager's descriptions
+        // Dynamically generate help message from the Commands descriptions in thr  CommandManager
         StringBuilder manual = new StringBuilder();
         commandManager.getCommandDescriptionMap().forEach((name, description) ->
                 manual.append(description).append("\n")
