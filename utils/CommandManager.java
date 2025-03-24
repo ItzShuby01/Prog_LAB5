@@ -1,9 +1,7 @@
 package org.example.utils;
 
-import org.example.collection.*;
 import org.example.commands.*;
 
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Consumer;
 
@@ -11,21 +9,24 @@ import java.util.function.Consumer;
 public class CommandManager {
     private final CollectionManager collectionManager;
     private final ConsoleManager consoleManager;
+    private  final PersonIOService personIOService;
+    private final IOService ioService;
     private final LinkedList<String> commandHistory = new LinkedList<>();
     private final HashMap<String, Consumer<String>> commandMap = new HashMap<>();
     private final Set<String> argumentRequiredCommands = new HashSet<>();
     private final HashMap<String, String> commandDescriptionMap = new HashMap<>();
 
-    //Constructor for CommandManager  with reference to  CollectionManager.
-    public CommandManager(CollectionManager collectionManager, ConsoleManager consoleManager) {
+    public CommandManager(CollectionManager collectionManager, ConsoleManager consoleManager,PersonIOService personIOService, IOService ioService) {
         this.collectionManager = collectionManager;
         this.consoleManager = consoleManager;
+        this.personIOService = personIOService;
+        this.ioService = ioService;
         initializeCommands();
     }
 
 
     private void initializeCommands() {
-       //Argument validation - make sure commands that require arguments are passed arguments
+       //Argument validation - to make sure commands that require arguments are passed arguments
         argumentRequiredCommands.add("update");
         argumentRequiredCommands.add("remove_by_id");
         argumentRequiredCommands.add("count_by_location");
@@ -36,51 +37,51 @@ public class CommandManager {
         commandMap.put("help", arg -> new Help(this).execute());
         commandDescriptionMap.put("help", "help: display help on available commands");
 
-        commandMap.put("exit", arg -> new Exit(consoleManager).execute());
+        commandMap.put("exit", arg -> new Exit(consoleManager, ioService).execute());
         commandDescriptionMap.put("exit", "exit: exit the program (without saving to file)");
 
-        commandMap.put("info", arg -> new Info(collectionManager).execute());
+        commandMap.put("info", arg -> new Info(collectionManager, ioService).execute());
         commandDescriptionMap.put("info", "info: print collection information (type, initialization date, number of elements, etc.) to standard output");
 
-        commandMap.put("show", arg -> new Show(collectionManager).execute());
+        commandMap.put("show", arg -> new Show(collectionManager,ioService).execute());
         commandDescriptionMap.put("show", "show: print all elements of the collection to standard output");
 
         commandMap.put("save", arg -> new Save(collectionManager).execute());
         commandDescriptionMap.put("save", "save: save collection to file");
 
-        commandMap.put("add", arg -> new Add(collectionManager).execute(arg));
+        commandMap.put("add", arg -> new Add(collectionManager, personIOService, ioService).execute(arg));
         commandDescriptionMap.put("add", "add {element}: add a new item to the collection");
 
-        commandMap.put("clear", arg -> new Clear(collectionManager).execute());
+        commandMap.put("clear", arg -> new Clear(collectionManager, ioService).execute());
         commandDescriptionMap.put("clear", "clear: clear collection");
 
-        commandMap.put("history", arg -> new History(commandHistory).execute());
+        commandMap.put("history", arg -> new History(commandHistory, ioService).execute());
         commandDescriptionMap.put("history", "history: print the last 7 commands (without their arguments)");
 
 
-        commandMap.put("max_by_id", arg -> new MaxById(collectionManager).execute());
+        commandMap.put("max_by_id", arg -> new MaxById(collectionManager, ioService).execute());
         commandDescriptionMap.put("max_by_id", "max_by_id: output any object from the collection whose id field value is maximum");
 
-        commandMap.put("average_of_height", arg -> new AverageOfHeight(collectionManager).execute());
+        commandMap.put("average_of_height", arg -> new AverageOfHeight(collectionManager, ioService).execute());
         commandDescriptionMap.put("average_of_height","average_of_height: output the average height field value for all elements in a collection");
 
-        commandMap.put("add_if_max", arg -> new AddIfMax(collectionManager).execute());
+        commandMap.put("add_if_max", arg -> new AddIfMax(collectionManager, personIOService, ioService).execute());
         commandDescriptionMap.put("add_if_max", "add_if_max {element}: add a new element to a collection if its value is greater than the value of the largest element in that collection");
 
 
 
 
         // Adding commands that require arguments
-        commandMap.put("update", arg -> new Update(collectionManager).execute(arg));
+        commandMap.put("update", arg -> new Update(collectionManager, personIOService, ioService).execute(arg));
         commandDescriptionMap.put("update", "update id {element}: update the value of the collection element whose id is equal to the given one");
 
-        commandMap.put("remove_by_id", arg -> new RemoveById(collectionManager).execute(arg));
+        commandMap.put("remove_by_id", arg -> new RemoveById(collectionManager, ioService).execute(arg));
         commandDescriptionMap.put("remove_by_id", "remove_by_id id: remove an element from a collection by its id");
 
-        commandMap.put("count_by_location", arg -> new CountByLocation(collectionManager).execute(arg));
+        commandMap.put("count_by_location", arg -> new CountByLocation(collectionManager, ioService).execute(arg));
         commandDescriptionMap.put("count_by_location", "count_by_location location: output the number of elements whose location field value is equal to the specified one");
 
-        commandMap.put("remove_lower", arg -> new RemoveLower(collectionManager).execute(arg));
+        commandMap.put("remove_lower", arg -> new RemoveLower(collectionManager, ioService).execute(arg));
         commandDescriptionMap.put("remove_lower", "remove_lower {element}: remove all elements from the collection that are less than the specified number");
 
         commandMap.put("execute_script", this::readCommandsFromScript);
@@ -105,13 +106,13 @@ public class CommandManager {
               // Skip argument checks for "add" in interactive mode
               if (argumentRequiredCommands.contains(commandName)) {
                   if (arg.isEmpty()) {
-                      System.out.println("Error: Command '" + commandName + "' requires an argument.");
+                      ioService.print("Error: Command '" + commandName + "' requires an argument.");
                       return;
                   }
               } else {
                   // Allow "add" to execute without arguments (interactive mode)
                   if (!arg.isEmpty()) {
-                      System.out.println("Error: Command '" + commandName + "' does not take an argument.");
+                      ioService.print("Error: Command '" + commandName + "' does not take an argument.");
                       return;
                   }
               }
@@ -119,7 +120,7 @@ public class CommandManager {
               commandMap.get(commandName).accept(arg);
               addToHistory(commandName);
           } else {
-              System.out.println("Command not found. Enter 'help' to see the manual");
+             ioService.print("Command not found. Enter 'help' to see the manual");
           }
       }    //Adds the commands (without arguments) to the command history.
     private void addToHistory(String commandName) {
@@ -141,7 +142,7 @@ public class CommandManager {
                 commandMap.get(commandName).accept(arg); // Execute directly
                 addToHistory(commandName);
             } else {
-                System.out.println("Command not found: " + commandName);
+                ioService.print("Command not found: " + commandName);
             }
         }
     }}
