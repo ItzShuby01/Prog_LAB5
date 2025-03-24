@@ -8,21 +8,25 @@ import java.util.function.Consumer;
 //This class Manages commands, their execution, and command history.
 public class CommandManager {
     private final CollectionManager collectionManager;
-    private final ConsoleManager consoleManager;
     private  final PersonIOService personIOService;
     private final IOService ioService;
     private final LinkedList<String> commandHistory = new LinkedList<>();
     private final HashMap<String, Consumer<String>> commandMap = new HashMap<>();
     private final Set<String> argumentRequiredCommands = new HashSet<>();
     private final HashMap<String, String> commandDescriptionMap = new HashMap<>();
+    private boolean exitRequested = false;
 
-    public CommandManager(CollectionManager collectionManager, ConsoleManager consoleManager,PersonIOService personIOService, IOService ioService) {
+
+    public CommandManager(CollectionManager collectionManager,PersonIOService personIOService, IOService ioService) {
         this.collectionManager = collectionManager;
-        this.consoleManager = consoleManager;
         this.personIOService = personIOService;
         this.ioService = ioService;
         initializeCommands();
     }
+
+    public boolean isExitRequested() {return exitRequested;}
+    public void requestExit() { exitRequested = true; }
+
 
 
     private void initializeCommands() {
@@ -37,7 +41,7 @@ public class CommandManager {
         commandMap.put("help", arg -> new Help(this).execute());
         commandDescriptionMap.put("help", "help: display help on available commands");
 
-        commandMap.put("exit", arg -> new Exit(consoleManager, ioService).execute());
+        commandMap.put("exit", arg -> new Exit(this, ioService).execute());
         commandDescriptionMap.put("exit", "exit: exit the program (without saving to file)");
 
         commandMap.put("info", arg -> new Info(collectionManager, ioService).execute());
