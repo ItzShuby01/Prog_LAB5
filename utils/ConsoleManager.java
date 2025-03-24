@@ -1,19 +1,15 @@
+
 package org.example.utils;
 
 import java.util.Scanner;
 
 public class ConsoleManager {
-    private CommandManager commandManager;
+    private final CommandManager commandManager;
     private boolean running = true;
 
-    public ConsoleManager() {}
 
-    public void setCommandManager(CommandManager commandManager) {
+    public ConsoleManager(CommandManager commandManager) {
         this.commandManager = commandManager;
-    }
-
-    public void stop() {
-        running = false;
     }
 
     public void interactiveMode() {
@@ -26,6 +22,9 @@ public class ConsoleManager {
                 String command = scanner.nextLine().trim();
                 if (!command.isEmpty()) {
                     commandManager.executeCommand(command);
+                }
+                    if (commandManager.isExitRequested()) {
+                        running = false;
                 }
             }
         }
