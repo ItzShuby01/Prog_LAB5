@@ -6,28 +6,38 @@ import java.time.LocalDateTime;
 
 public class Add implements Command {
     private final CollectionManager collectionManager;
+    private final PersonIOService personIOService;
+    private final IOService ioService;
 
-    public Add(CollectionManager collectionManager) {
+    public Add(CollectionManager collectionManager, PersonIOService personIOService, IOService ioService) {
         this.collectionManager = collectionManager;
+        this.personIOService = personIOService;
+        this.ioService = ioService;
     }
 
     @Override
     public void execute() {
-        // 1) Interactive mode: prompt user for input
-        collectionManager.addPerson();
+        // 1) interactive mode
+        Person person = personIOService.readPerson();
+        boolean added = collectionManager.add(person);
+        if (added) {
+            ioService.print(person.getName() + " added to collection");
+        } else {
+            ioService.print("Failed to add person");
+        }
     }
 
     @Override
     public void execute(String arg) {
         if (arg == null || arg.isEmpty()) {
-            execute(); // Fallback to interactive mode
+            execute();
             return;
         }
 
         // 2) Script mode: parse and read  arguments from file
         String[] parts = arg.split(",");
         if (parts.length != 10) {
-            System.out.println("Error: Expected 10 fields for 'add' command.");
+           ioService.print("Error: Expected 10 fields for 'add' command.");
             return;
         }
 
@@ -59,9 +69,9 @@ public class Add implements Command {
             );
 
             collectionManager.add(person);
-            System.out.println("Added: " + person.getName());
+            ioService.print("Added: " + person.getName());
         } catch (Exception e) {
-            System.out.println("Error parsing 'add' command: " + e.getMessage());
+           ioService.print("Error parsing 'add' command: " + e.getMessage());
         }
     }
 }
