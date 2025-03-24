@@ -2,12 +2,18 @@ package org.example.commands;
 
 import org.example.collection.Person;
 import org.example.utils.CollectionManager;
+import org.example.utils.IOService;
+import org.example.utils.PersonIOService;
 
 public class Update implements Command {
     private final CollectionManager collectionManager;
+    private final PersonIOService personIOService;
+    private final IOService ioService;
 
-    public Update(CollectionManager collectionManager) {
+    public Update(CollectionManager collectionManager, PersonIOService personIOService, IOService ioService) {
         this.collectionManager = collectionManager;
+        this.personIOService = personIOService;
+        this.ioService = ioService;
     }
 
     @Override
@@ -19,16 +25,16 @@ public class Update implements Command {
             for(Person person : collectionManager.getPersonTreeSet()) {
                 if(person.getId() == id) {
                     idFound = true;
-                    collectionManager.updatePerson(person);
+                    personIOService.updatePerson(person);
                     break;
                 }
             }
 
             if(!idFound) {
-                System.out.println("Id not found in collection");
+                ioService.print("Id not found in collection");
             }
         } catch (Exception e){
-            System.out.println("Invalid Id format");
+            ioService.print("Invalid Id format");
         }
 
 
