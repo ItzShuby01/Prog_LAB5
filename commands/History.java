@@ -1,21 +1,23 @@
 package org.example.commands;
 
-import org.example.utils.CollectionManager;
+import org.example.utils.IOService;
+
 import java.util.LinkedList;
 
 public class History implements Command {
     private final LinkedList<String> commandHistory;
+    private final IOService ioService;
 
-    public History(LinkedList<String> commandHistory) {
+    public History(LinkedList<String> commandHistory, IOService ioService) {
         this.commandHistory = commandHistory;
+        this.ioService = ioService;
     }
 
     @Override
     public void execute() {
-        System.out.println("Last " + commandHistory.size() + " commands:");
+        ioService.print("Last " + commandHistory.size() + " commands:");
         for (String command : commandHistory) {
-            System.out.println(command);
+            ioService.print(command);
         }
     }
-
 }
