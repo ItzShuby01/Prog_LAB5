@@ -15,6 +15,9 @@ public class Save implements Command {
     public void execute() {
         FileManager fileManager = new FileManager(collectionManager);
         String filePath = System.getenv("COLLECTION_FILE_PATH");
+        if (filePath == null || filePath.isEmpty()) {
+            filePath = "storage.xml";
+        }
         fileManager.saveCollectionToXml(filePath);
     }
 }
