@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<persons>
+    <person>
+        <id>1264673255</id>
+        <name>Alice</name>
+        <coordinates>
+            <x>400</x>
+            <y>50.0</y>
+        </coordinates>
+        <creationDate>2025-03-25T01:25:49.177032</creationDate>
+        <height>172.3</height>
+        <eyeColor>BLACK</eyeColor>
+        <hairColor>BLUE</hairColor>
+        <nationality>GERMANY</nationality>
+        <location>
+            <x>55.55</x>
+            <y>44.44</y>
+            <name>Berlin</name>
+        </location>
+    </person>
+</persons>
