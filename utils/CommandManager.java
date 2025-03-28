@@ -8,7 +8,7 @@ import java.util.function.Consumer;
 //This class Manages commands, their execution, and command history.
 public class CommandManager {
     private final CollectionManager collectionManager;
-    private  final PersonIOService personIOService;
+    private final PersonIOService personIOService;
     private final IOService ioService;
     private final LinkedList<String> commandHistory = new LinkedList<>();
     private final HashMap<String, Consumer<String>> commandMap = new HashMap<>();
@@ -17,20 +17,24 @@ public class CommandManager {
     private boolean exitRequested = false;
 
 
-    public CommandManager(CollectionManager collectionManager,PersonIOService personIOService, IOService ioService) {
+    public CommandManager(CollectionManager collectionManager, PersonIOService personIOService, IOService ioService) {
         this.collectionManager = collectionManager;
         this.personIOService = personIOService;
         this.ioService = ioService;
         initializeCommands();
     }
 
-    public boolean isExitRequested() {return exitRequested;}
-    public void requestExit() { exitRequested = true; }
+    public boolean isExitRequested() {
+        return exitRequested;
+    }
 
+    public void requestExit() {
+        exitRequested = true;
+    }
 
 
     private void initializeCommands() {
-       //Argument validation - to make sure commands that require arguments are passed arguments
+        //Argument validation - to make sure commands that require arguments are passed arguments
         argumentRequiredCommands.add("update");
         argumentRequiredCommands.add("remove_by_id");
         argumentRequiredCommands.add("count_by_location");
@@ -47,7 +51,7 @@ public class CommandManager {
         commandMap.put("info", arg -> new Info(collectionManager, ioService).execute());
         commandDescriptionMap.put("info", "info: print collection information (type, initialization date, number of elements, etc.) to standard output");
 
-        commandMap.put("show", arg -> new Show(collectionManager,ioService).execute());
+        commandMap.put("show", arg -> new Show(collectionManager, ioService).execute());
         commandDescriptionMap.put("show", "show: print all elements of the collection to standard output");
 
         commandMap.put("save", arg -> new Save(collectionManager).execute());
@@ -67,12 +71,10 @@ public class CommandManager {
         commandDescriptionMap.put("max_by_id", "max_by_id: output any object from the collection whose id field value is maximum");
 
         commandMap.put("average_of_height", arg -> new AverageOfHeight(collectionManager, ioService).execute());
-        commandDescriptionMap.put("average_of_height","average_of_height: output the average height field value for all elements in a collection");
+        commandDescriptionMap.put("average_of_height", "average_of_height: output the average height field value for all elements in a collection");
 
         commandMap.put("add_if_max", arg -> new AddIfMax(collectionManager, personIOService, ioService).execute());
         commandDescriptionMap.put("add_if_max", "add_if_max {element}: add a new element to a collection if its value is greater than the value of the largest element in that collection");
-
-
 
 
         // Adding commands that require arguments
@@ -88,7 +90,7 @@ public class CommandManager {
         commandMap.put("remove_lower", arg -> new RemoveLower(collectionManager, ioService).execute(arg));
         commandDescriptionMap.put("remove_lower", "remove_lower {element}: remove all elements from the collection that are less than the specified number");
 
-        commandMap.put("execute_script", this::readCommandsFromScript);
+        commandMap.put("execute_script", this::executeScript);
         commandDescriptionMap.put("execute_script", "execute_script file_name: read and execute the script from the specified file. The script contains commands in the same form in which the user enters them in interactive mode");
 
     }
@@ -99,34 +101,33 @@ public class CommandManager {
     }
 
 
-      //Executes the given command by retrieving it from the command map.
-      //If the command is not found, it prints an error message.
-      public void executeCommand(String command) {
-          String[] commandArray = command.split(" ", 2);
-          String commandName = commandArray[0];
-          String arg = (commandArray.length == 2) ? commandArray[1] : "";
+    //Executes the given command by retrieving it from the command map.
+    //If the command is not found, it prints an error message.
+    public void executeCommand(String command) {
+        String[] commandArray = command.split(" ", 2);
+        String commandName = commandArray[0];
+        String arg = (commandArray.length == 2) ? commandArray[1] : "";
 
-          if (commandMap.containsKey(commandName)) {
-              // Skip argument checks for "add" in interactive mode
-              if (argumentRequiredCommands.contains(commandName)) {
-                  if (arg.isEmpty()) {
-                      ioService.print("Error: Command '" + commandName + "' requires an argument.");
-                      return;
-                  }
-              } else {
-                  // Allow "add" to execute without arguments (interactive mode)
-                  if (!arg.isEmpty()) {
-                      ioService.print("Error: Command '" + commandName + "' does not take an argument.");
-                      return;
-                  }
-              }
+        if (commandMap.containsKey(commandName)) {
+            if (argumentRequiredCommands.contains(commandName)) {
+                if (arg.isEmpty()) {
+                    ioService.print("Error: Command '" + commandName + "' requires an argument.");
+                    return;
+                }
+            } else {
+                if (!arg.isEmpty()) {
+                    ioService.print("Error: Command '" + commandName + "' does not take an argument.");
+                    return;
+                }
+            }
 
-              commandMap.get(commandName).accept(arg);
-              addToHistory(commandName);
-          } else {
-             ioService.print("Command not found. Enter 'help' to see the manual");
-          }
-      }    //Adds the commands (without arguments) to the command history.
+            commandMap.get(commandName).accept(arg);
+            addToHistory(commandName);
+        } else {
+            ioService.print("Command not found. Enter 'help' to see the manual");
+        }
+    }    //Adds the commands (without arguments) to the command history.
+
     private void addToHistory(String commandName) {
         if (commandHistory.size() == 7) {
             commandHistory.removeFirst();
@@ -135,18 +136,50 @@ public class CommandManager {
     }
 
     //Reads and executes commands from a script file.
-    private void readCommandsFromScript(String filePath) {
+    private void executeScript(String filePath) {
         FileManager fileManager = new FileManager(collectionManager);
-        for (String command : fileManager.loadCommandsFromScript(filePath)) {
-            String[] parts = command.split(" ", 2); // Split into command name and arguments
-            String commandName = parts[0];
-            String arg = parts.length > 1 ? parts[1] : "";
+        List<String> lines = fileManager.readScript(filePath);
+        int index = 0;
 
-            if (commandMap.containsKey(commandName)) {
-                commandMap.get(commandName).accept(arg); // Execute directly
-                addToHistory(commandName);
+        while (index < lines.size()) {
+            String line = lines.get(index).trim();
+            if (line.isEmpty()) {
+                index++;
+                continue;
+            }
+
+            if (line.equals("add")) {
+                // case 1: Validate there are enough lines for the 'add' command
+                if (index + 10 >= lines.size()) {
+                    ioService.print("Error: Incomplete 'add' command at line " + (index + 1));
+                    return;
+                }
+                // Collect the next 10 lines as arguments for 'add'
+                StringBuilder argBuilder = new StringBuilder();
+                for (int i = 1; i <= 10; i++) {
+                    argBuilder.append(lines.get(index + i).trim()).append("\n");
+                }
+                String argString = argBuilder.toString().trim();
+
+                // Execute the 'add' command
+                commandMap.get("add").accept(argString);
+                index += 11;
+
+
             } else {
-                ioService.print("Command not found: " + commandName);
+                // case 2: Handle normal commands (split them  into 'command' + 'args')
+                String[] parts = line.split(" ", 2);
+                String commandName = parts[0];
+                String arg = parts.length > 1 ? parts[1] : "";
+
+                if (commandMap.containsKey(commandName)) {
+                    commandMap.get(commandName).accept(arg);
+                    addToHistory(commandName);
+                } else {
+                    ioService.print("Command not found: " + commandName);
+                }
+                index++;
             }
         }
-    }}
+    }
+}
