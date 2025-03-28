@@ -5,7 +5,7 @@ import org.example.commands.*;
 import java.util.*;
 import java.util.function.Consumer;
 
-//This class Manages commands, their execution, and command history.
+//This class Manages commands, their execution, and  command history.
 public class CommandManager {
     private final CollectionManager collectionManager;
     private final PersonIOService personIOService;
