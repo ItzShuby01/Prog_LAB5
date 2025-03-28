@@ -21,7 +21,7 @@ public class Add implements Command {
         Person person = personIOService.readPerson();
         boolean added = collectionManager.add(person);
         if (added) {
-            ioService.print(person.getName() + " added to collection");
+            ioService.print(person.getName() + " has been added to the collection");
         } else {
             ioService.print("Failed to add person");
         }
@@ -34,27 +34,90 @@ public class Add implements Command {
             return;
         }
 
-        // 2) Script mode: parse and read  arguments from file
-        String[] parts = arg.split(",");
+        // 2) Script mode
+        String[] parts = arg.split("\\n");
         if (parts.length != 10) {
-           ioService.print("Error: Expected 10 fields for 'add' command.");
+            ioService.print("Error: Need exactly 10 lines of data");
             return;
         }
 
         try {
+            // Parse the fields...
             String name = parts[0].trim();
             double x = Double.parseDouble(parts[1].trim());
             double y = Double.parseDouble(parts[2].trim());
             double height = Double.parseDouble(parts[3].trim());
-            EyeColor eyeColor = EyeColor.valueOf(parts[4].trim().toUpperCase());
-            HairColor hairColor = HairColor.valueOf(parts[5].trim().toUpperCase());
-            Country nationality = Country.valueOf(parts[6].trim().toUpperCase());
+
+            // EyeColor Validation
+            String eyeColorStr = parts[4].trim().toUpperCase();
+            EyeColor eyeColor;
+            switch (eyeColorStr) {
+                case "RED":
+                    eyeColor = EyeColor.RED;
+                    break;
+                case "BLACK":
+                    eyeColor = EyeColor.BLACK;
+                    break;
+                case "ORANGE":
+                    eyeColor = EyeColor.ORANGE;
+                    break;
+                default:
+                    ioService.print("Invalid eye color: '" + eyeColorStr + "'. Valid options: RED, BLACK, ORANGE");
+                    return;
+            }
+
+            //  HairColor validation
+            String hairColorStr = parts[5].trim().toUpperCase();
+            HairColor hairColor;
+            switch (hairColorStr) {
+                case "GREEN":
+                    hairColor = HairColor.GREEN;
+                    break;
+                case "BLUE":
+                    hairColor = HairColor.BLUE;
+                    break;
+                case "YELLOW":
+                    hairColor = HairColor.YELLOW;
+                    break;
+                case "BROWN":
+                    hairColor = HairColor.BROWN;
+                    break;
+                default:
+                    ioService.print("Invalid hair color: '" + hairColorStr + "'. Valid options: GREEN, BLUE, YELLOW, BROWN");
+                    return;
+            }
+
+            // Nationality Validation
+            String countryStr = parts[6].trim().toUpperCase();
+            Country nationality;
+            switch (countryStr) {
+                case "RUSSIA":
+                    nationality = Country.RUSSIA;
+                    break;
+                case "GERMANY":
+                    nationality = Country.GERMANY;
+                    break;
+                case "ITALY":
+                    nationality = Country.ITALY;
+                    break;
+                case "THAILAND":
+                    nationality = Country.THAILAND;
+                    break;
+                case "JAPAN":
+                    nationality = Country.JAPAN;
+                    break;
+                default:
+                    ioService.print("Invalid country: '" + countryStr + "'. Valid options: RUSSIA, GERMANY, ITALY, THAILAND, JAPAN.");                    return;
+            }
+
+            // ...Parse remaining fields
             double locationX = Double.parseDouble(parts[7].trim());
             double locationY = Double.parseDouble(parts[8].trim());
             String locationName = parts[9].trim();
 
-            Coordinates coordinates = new Coordinates((int)x, y);
-            Location location = new Location((float) locationX, (float)locationY, locationName);
+
+            Coordinates coordinates = new Coordinates((int) x, y);
+            Location location = new Location((float) locationX, (float) locationY, locationName);
 
             Person person = new Person(
                     collectionManager.generateId(),
@@ -69,9 +132,12 @@ public class Add implements Command {
             );
 
             collectionManager.add(person);
-            ioService.print("Added: " + person.getName());
+            ioService.print(person.getName() + " has been added to the collection");
+
+        } catch (NumberFormatException e) {
+            ioService.print("Invalid number format in input");
         } catch (Exception e) {
-           ioService.print("Error parsing 'add' command: " + e.getMessage());
+            ioService.print("Error: " + e.getMessage());
         }
     }
 }
