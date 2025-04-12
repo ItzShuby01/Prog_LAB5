@@ -58,6 +58,14 @@ public class Person implements Comparable<Person>{
         this.coordinates = coordinates;
     }
 
+    public Coordinates getCoordinates() {
+        return coordinates;
+    }
+
+    public void setCreationDate(LocalDateTime creationDate) {
+        this.creationDate = creationDate;
+    }
+
     public double getHeight() {
         return height;
     }
@@ -70,9 +78,16 @@ public class Person implements Comparable<Person>{
         this.eyeColor = eyeColor;
     }
 
+    public EyeColor getEyeColor() {
+        return eyeColor;
+    }
 
     public void setHairColor(HairColor hairColor) {
         this.hairColor = hairColor;
+    }
+
+    public HairColor getHairColor() {
+        return hairColor;
     }
 
     public void setNationality(Country nationality) {
@@ -81,6 +96,10 @@ public class Person implements Comparable<Person>{
 
     public Location getLocation() {
         return location;
+    }
+
+    public Country getNationality() {
+        return nationality;
     }
 
     public void setLocation(Location location) {
