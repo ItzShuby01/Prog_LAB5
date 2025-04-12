@@ -91,6 +91,14 @@ public class CollectionManager {
         }
         return count;
     }
+    public Person getById(int id) {
+        for (Person person : personTreeSet) {
+            if (person.getId() == id) {
+                return person;
+            }
+        }
+        return null;
+    }
 
     public static class InfoData {
         private final String collectionType;
