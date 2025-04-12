@@ -1,3 +1,4 @@
+
 package org.example.utils;
 
 import org.example.commands.*;
@@ -73,12 +74,12 @@ public class CommandManager {
         commandMap.put("average_of_height", arg -> new AverageOfHeight(collectionManager, ioService).execute());
         commandDescriptionMap.put("average_of_height", "average_of_height: output the average height field value for all elements in a collection");
 
-        commandMap.put("add_if_max", arg -> new AddIfMax(collectionManager, personIOService, ioService).execute());
+        commandMap.put("add_if_max", arg -> new AddIfMax(collectionManager, personIOService, ioService).execute(arg));
         commandDescriptionMap.put("add_if_max", "add_if_max {element}: add a new element to a collection if its value is greater than the value of the largest element in that collection");
 
 
         // Adding commands that require arguments
-        commandMap.put("update", arg -> new Update(collectionManager, personIOService, ioService).execute(arg));
+        commandMap.put("update", arg -> new Update(collectionManager, ioService, personIOService).execute(arg));
         commandDescriptionMap.put("update", "update id {element}: update the value of the collection element whose id is equal to the given one");
 
         commandMap.put("remove_by_id", arg -> new RemoveById(collectionManager, ioService).execute(arg));
@@ -126,8 +127,9 @@ public class CommandManager {
         } else {
             ioService.print("Command not found. Enter 'help' to see the manual");
         }
-    }    //Adds the commands (without arguments) to the command history.
+    }
 
+    //Adds the commands (without arguments) to the command history.
     private void addToHistory(String commandName) {
         if (commandHistory.size() == 7) {
             commandHistory.removeFirst();
@@ -148,26 +150,95 @@ public class CommandManager {
                 continue;
             }
 
-            if (line.equals("add")) {
-                // case 1: Validate there are enough lines for the 'add' command
-                if (index + 10 >= lines.size()) {
-                    ioService.print("Error: Incomplete 'add' command at line " + (index + 1));
-                    return;
-                }
-                // Collect the next 10 lines as arguments for 'add'
-                StringBuilder argBuilder = new StringBuilder();
-                for (int i = 1; i <= 10; i++) {
-                    argBuilder.append(lines.get(index + i).trim()).append("\n");
-                }
-                String argString = argBuilder.toString().trim();
+            // case 1 : Handle add, add_if_max, and update commands
+            if (line.equals("add") || line.equals("add_if_max") || line.startsWith("update ")) {
+                boolean isAddIfMax = line.equals("add_if_max");
+                boolean isUpdate = line.startsWith("update ");
+                String id = "";
 
-                // Execute the 'add' command
-                commandMap.get("add").accept(argString);
+                // Validate and extract ID for update command
+                if (isUpdate) {
+                    String[] parts = line.split(" ", 2);
+                    if (parts.length < 2) {
+                        ioService.print("Invalid update command: missing ID");
+                        index++;
+                        continue;
+                    }
+                    id = parts[1];
+                    try {
+                        Integer.parseInt(id);
+                    } catch (NumberFormatException e) {
+                        ioService.print("Invalid ID format: " + id);
+                        index++;
+                        continue;
+                    }
+                }
+
+                boolean inputsValid = false;
+                int attemptCount = 0;
+
+                while (!inputsValid && attemptCount < 5) { // set limit to 5 attempts to prevent infinite loop
+                    attemptCount++;
+                    inputsValid = true;
+
+                    for (int inputIndex = 0; inputIndex < 10; inputIndex++) {
+                        int lineIndex = index + 1 + inputIndex;
+                        String currentValue = (lineIndex < lines.size())
+                                ? lines.get(lineIndex).trim()
+                                : "";
+
+                        if (!Add.inputValidation(inputIndex, currentValue, ioService)) {
+                            inputsValid = false;
+
+                            // Clear invalid lines and prompt for new inputs
+                            if (lineIndex < lines.size()) {
+                                lines.subList(lineIndex, lines.size()).clear();
+                            }
+
+                            List<String> newInputs = new ArrayList<>();
+                            for (int i = inputIndex; i < 10; i++) {
+                                String input = "";
+                                boolean valid = false;
+                                while (!valid) {
+                                    input = ioService.readLine("Enter " + Add.INPUTS_LABELS[i] + ": ");
+                                    if (i == 4 || i == 5 || i == 6) { // Enums
+                                        input = input.toUpperCase();
+                                    }
+                                    valid = Add.inputValidation(i, input, ioService);
+                                }
+                                newInputs.add(input);
+                            }
+                            lines.addAll(lineIndex, newInputs);
+                            break;
+                        }
+                    }
+                }
+
+                if (inputsValid) {
+                    StringBuilder argBuilder = new StringBuilder();
+                    if (isUpdate) {
+                        argBuilder.append(id).append("\n"); // Add ID for 'Update'
+                    }
+                    for (int i = 1; i <= 10; i++) {
+                        argBuilder.append(lines.get(index + i).trim()).append("\n");
+                    }
+                    String argString = argBuilder.toString().trim();
+
+                    if (isAddIfMax) {
+                        new AddIfMax(collectionManager, personIOService, ioService).execute(argString);
+                    } else if (isUpdate) {
+                        new Update(collectionManager, ioService, personIOService).execute(argString);
+                    } else {
+                        new Add(collectionManager, personIOService, ioService).execute(argString);
+                    }
+                } else {
+                    ioService.print("Too many failed attempts. Skipping command.");
+                }
+
                 index += 11;
 
-
             } else {
-                // case 2: Handle normal commands (split them  into 'command' + 'args')
+                // case 2: Handle normal commands (split them  into 'command' + 'arg')
                 String[] parts = line.split(" ", 2);
                 String commandName = parts[0];
                 String arg = parts.length > 1 ? parts[1] : "";
@@ -178,8 +249,8 @@ public class CommandManager {
                 } else {
                     ioService.print("Command not found: " + commandName);
                 }
+
                 index++;
             }
         }
-    }
-}
+    }}
