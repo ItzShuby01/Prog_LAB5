@@ -1,34 +1,31 @@
 package org.example.commands;
 
-import org.example.collection.Person;
+import org.example.collection.*;
 import org.example.utils.CollectionManager;
 import org.example.utils.IOService;
+import org.example.utils.PersonIOService;
 
 import java.util.List;
 
 public class RemoveLower implements Command {
     private final CollectionManager collectionManager;
     private final IOService ioService;
+    private final PersonIOService personIOService;
 
-
-    public RemoveLower(CollectionManager collectionManager, IOService ioService) {
+    public RemoveLower(CollectionManager collectionManager, IOService ioService, PersonIOService personIOService) {
         this.collectionManager = collectionManager;
         this.ioService = ioService;
+        this.personIOService = personIOService;
     }
 
     @Override
-    public void execute(String arg) {
+    public void execute() {
         try {
-            int id = Integer.parseInt(arg);
-            List<Person> removedPersons = collectionManager.removeLower(id);
-
-            if (removedPersons.isEmpty()) {
-                ioService.print("No Persons removed. Either ID was not found or the given ID is the lowest.");
-            } else {
-                ioService.print("Removed " + removedPersons.size() + " elements lower than ID " + id);
-            }
-        } catch (NumberFormatException e) {
-            ioService.print("Invalid ID. Please enter an integer." + e.getMessage());
+            Person threshold = personIOService.readPerson();
+            List<Person> removedPersons = collectionManager.removeLower(threshold);
+            ioService.print("Removed " + removedPersons.size() + " persons");
+        } catch (Exception e) {
+            ioService.print("Error: " + e.getMessage());
         }
     }
 }
