@@ -39,7 +39,6 @@ public class CommandManager {
         argumentRequiredCommands.add("update");
         argumentRequiredCommands.add("remove_by_id");
         argumentRequiredCommands.add("count_by_location");
-        argumentRequiredCommands.add("remove_lower");
         argumentRequiredCommands.add("execute_script");
 
         //Initializes all available commands and stores them in a Command map.
