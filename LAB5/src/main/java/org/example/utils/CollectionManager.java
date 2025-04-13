@@ -11,10 +11,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.TreeSet;
+import java.util.*;
 
 public class CollectionManager {
     private final TreeSet<Person> personTreeSet = new TreeSet<>();
@@ -147,32 +144,12 @@ public class CollectionManager {
     }
 
     // Helper for 'REMOVE_LOWER'
-    public List<Person> removeLower(int inputtedId) {
-        List<Person> toRemove = new ArrayList<>();
-        Person referencePerson = null;
-
-        // Find the reference person
-        for (Person person : personTreeSet) {
-            if (person.getId() == inputtedId) {
-                referencePerson = person;
-                break;
-            }
-        }
-
-        if (referencePerson == null) {
-            return List.of(); // No person found with the inputted ID
-        }
-
-        // Collect persons to remove
-        for (Person person : personTreeSet) {
-            if (referencePerson.getId() > person.getId()) {
-                toRemove.add(person);
-            }
-        }
-
-        // Remove collected persons
-         toRemove.forEach(personTreeSet::remove);
-        return toRemove; // Return the removed persons
+    public List<Person> removeLower(Person threshold) {
+        // Use TreeSet's built-in headSet()
+        Set<Person> removed = personTreeSet.headSet(threshold);
+        List<Person> result = new ArrayList<>(removed);
+        personTreeSet.removeAll(removed);
+        return result;
     }
 
 
