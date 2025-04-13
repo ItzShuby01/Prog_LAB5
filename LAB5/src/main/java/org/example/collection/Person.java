@@ -12,7 +12,7 @@ import java.time.format.DateTimeFormatter;
 
 @XmlRootElement(name = "person")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class Person implements Comparable<Person>{
+public class Person implements Comparable<Person> {
     private Integer id; //Поле не может быть null, Значение поля должно быть больше 0, Значение этого поля должно быть уникальным, Значение этого поля должно генерироваться автоматически
     private String name; //Поле не может быть null, Строка не может быть пустой
     private Coordinates coordinates; //Поле не может быть null
@@ -127,6 +127,6 @@ public class Person implements Comparable<Person>{
 
     @Override
     public int compareTo(Person other) {
-        return this.id.compareTo(other.id);
+        return Double.compare(this.height, other.height);
     }
 }
