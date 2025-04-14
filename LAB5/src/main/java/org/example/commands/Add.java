@@ -14,18 +14,6 @@ public class Add implements Command {
         this.collectionManager = collectionManager;
         this.personIOService = personIOService;
         this.ioService = ioService;
-    }
-
-    @Override
-    public void execute() {
-        // 1) Interactive mode
-        Person person = personIOService.readPerson();
-        if (collectionManager.add(person)) {
-            ioService.print(person.getName() + " added to collection");
-        } else {
-            ioService.print("Failed to add person");
-        }
-    }
 
 
 
