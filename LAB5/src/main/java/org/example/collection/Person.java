@@ -120,6 +120,7 @@ public class Person implements Comparable<Person> {
         personString += "height: " + height + "\n";
         personString += "eye color: " + eyeColor + "\n";
         personString += "hair color: " + hairColor + "\n";
+        personString += "Nationality: " + nationality + "\n";
         personString += location.toString();
 
         return personString;

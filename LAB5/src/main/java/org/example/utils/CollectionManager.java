@@ -12,15 +12,16 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class CollectionManager {
-    private final TreeSet<Person> personTreeSet = new TreeSet<>();
+    private final Set<Person> personTreeSet = new TreeSet<>();
+    private final String collectionFilePath;
 
-
-    //Getter method and also Helper method for 'SHOW'
-    public TreeSet<Person> getPersonTreeSet() {
-        return personTreeSet;
+    public CollectionManager(String collectionFilePath) {
+        this.collectionFilePath = collectionFilePath;
     }
+
 
     // Set the collection
     public void setPersonTreeSet(TreeSet<Person> loadedCollection) {
@@ -36,14 +37,15 @@ public class CollectionManager {
     }
 
     //Automatically generates ID
-    public int generateId(){
+    public int generateId() {
         Random random = new Random();
-        int id = random.nextInt(Integer.MAX_VALUE) + 1;
-        for (Person person : personTreeSet) {
-            while (person.getId() == id) {
-                id = random.nextInt(Integer.MAX_VALUE) + 1;
-            }
-        }
+        int id;
+        Set<Integer> existingIds = personTreeSet.stream()
+                .map(Person::getId)
+                .collect(Collectors.toSet());
+        do {
+            id = random.nextInt(Integer.MAX_VALUE) + 1;
+        } while (existingIds.contains(id));
         return id;
     }
 
@@ -66,8 +68,10 @@ public class CollectionManager {
 
     // Get the person with the maximum ID
     public Person getMaxById() {
-        return personTreeSet.isEmpty() ? null : personTreeSet.last();
+        if (personTreeSet.isEmpty()) return null;
+        return ((TreeSet<Person>) personTreeSet).last(); // Cast to TreeSet
     }
+
 
     public double getAverageHeight() {
         if (personTreeSet.isEmpty()) {
@@ -89,12 +93,10 @@ public class CollectionManager {
         return count;
     }
     public Person getById(int id) {
-        for (Person person : personTreeSet) {
-            if (person.getId() == id) {
-                return person;
-            }
-        }
-        return null;
+        return personTreeSet.stream()
+                .filter(p -> p.getId() == id)
+                .findFirst()
+                .orElse(null);
     }
 
     public static class InfoData {
@@ -125,13 +127,12 @@ public class CollectionManager {
 
     // Helper for 'INFO' to get the initialization date from the storage file
     private String getInitializationDate() {
-        String date = " ";
-        String path = System.getenv("COLLECTION_FILE_PATH");
-        if (path == null) {
+        String date;
+        if (collectionFilePath == null) {
             return "Initialization date not available because the environmental variable is not set";
         }
         try {
-            BasicFileAttributes attributes = Files.readAttributes(Path.of(path), BasicFileAttributes.class);
+            BasicFileAttributes attributes = Files.readAttributes(Path.of(collectionFilePath), BasicFileAttributes.class);
             FileTime fileTime = attributes.creationTime();
             Instant instant = fileTime.toInstant();
             LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
@@ -144,14 +145,12 @@ public class CollectionManager {
     }
 
     // Helper for 'REMOVE_LOWER'
-    public List<Person> removeLower(Person threshold) {
-        // Use TreeSet's built-in headSet()
-        Set<Person> removed = personTreeSet.headSet(threshold);
-        List<Person> result = new ArrayList<>(removed);
-        personTreeSet.removeAll(removed);
-        return result;
-    }
 
+    public List<Person> removeLower(Person threshold) {
+        Set<Person> lower = new TreeSet<>(((TreeSet<Person>) personTreeSet).headSet(threshold)); // copy
+        personTreeSet.removeAll(lower);
+        return new ArrayList<>(lower);
+    }
 
     // Get the maximum height of persons in the collection
     public double getMaxHeight() {

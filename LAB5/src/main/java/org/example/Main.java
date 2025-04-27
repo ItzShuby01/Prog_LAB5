@@ -7,24 +7,25 @@ public class Main {
 
     public static void main(String[] args) {
         try ( ConsoleIOService ioService = new ConsoleIOService()){
-            CollectionManager collectionManager = new CollectionManager();
+            String fileName = System.getenv("COLLECTION_FILE_PATH");
+
+            CollectionManager collectionManager = new CollectionManager(fileName);
             FileManager fileManager = new FileManager(collectionManager);
             PersonIOService personIOService= new PersonIOService(ioService, collectionManager);
 
             //setting environmental variables.
             //if you want to set environmental variables in your IDE, then set it up
-            String fileName = System.getenv("COLLECTION_FILE_PATH");
 
-            if (fileName == null) {
-                System.out.println("Environment variable COLLECTION_FILE_PATH is not set or is empty.");
-                return;
-            }
-
-            // 1. for environmental variable
-            fileManager.loadCollectionFromXml(fileName);
+//            if (fileName == null) {
+//                System.out.println("Environment variable COLLECTION_FILE_PATH is not set or is empty.");
+//                return;
+//            }
+//
+//            // 1. for environmental variable
+//            fileManager.loadCollectionFromXml(fileName);
 
             //2. If you don’t want to use environmental variables in your IDE , uncomment the line below,  and then comment/remove lines 16 to 24
-           // fileManager.loadCollectionFromXml("storage.xml");
+            fileManager.loadCollectionFromXml("storage.xml");
 
             //3. Uncomment the line below if you want to pass the name of the file directly in the CLI( terminal)
             //fileManager.loadCollectionFromXml(args[0]);
@@ -33,6 +34,7 @@ public class Main {
             CommandManager commandManager = new CommandManager(collectionManager,personIOService, ioService);
             ConsoleManager consoleManager = new ConsoleManager(commandManager);
 
+            //System.out.println("JAXB Available: " + javax.xml.bind.JAXBContext.class.getProtectionDomain().getCodeSource().getLocation());
 
             consoleManager.interactiveMode();
 

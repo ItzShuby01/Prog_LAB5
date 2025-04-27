@@ -1,17 +1,17 @@
 package org.example.commands;
 
-import org.example.collection.*;
-import org.example.utils.CollectionManager;
-import org.example.utils.IOService;
-import org.example.utils.PersonIOService;
+import org.example.collection.Person;
+import org.example.utils.*;
+import java.util.ArrayList;
+import java.util.List;
+import static org.example.utils.PersonIOService.INPUTS_LABELS;
 
-import java.time.LocalDateTime;
-import java.util.Arrays;
-
-public class Update implements Command {
+public class Update implements Command, ScriptCommand {
     private final CollectionManager collectionManager;
     private final IOService ioService;
     private final PersonIOService personIOService;
+    public static final String DESCRIPTION =  "update id {element}: update the value of the collection element whose id is equal to the given one";
+
 
     public Update(CollectionManager collectionManager, IOService ioService, PersonIOService personIOService) {
         this.collectionManager = collectionManager;
@@ -21,94 +21,61 @@ public class Update implements Command {
 
     @Override
     public void execute(String arg) {
-        if (arg == null || arg.trim().isEmpty()) {
-            ioService.print("Error: Missing ID or parameters for update command");
+        if (arg == null || arg.isBlank()) {
+            ioService.print("Error: Missing ID or parameters");
             return;
         }
-
-        // Interactive mode
-        if (!arg.contains("\n")) {
+        String[] parts = arg.split("\\R");
+        // if only ID provided -> interactive
+        if (parts.length == 1) {
             try {
-                int id = Integer.parseInt(arg.trim());
-                Person existing = collectionManager.getById(id);
-                if (existing == null) {
-                    ioService.print("Person with ID " + id + " not found");
-                    return;
+                int id = Integer.parseInt(parts[0].trim());
+                Person p = collectionManager.getById(id);
+                if (p == null) {
+                    ioService.print("Person with ID: " + id + " not found");
+                } else {
+                    personIOService.updatePerson(p);
                 }
-                // Trigger interactive update
-                personIOService.updatePerson(existing);
-                return;
-            } catch (NumberFormatException e) {
-                ioService.print("Invalid ID format: " + arg);
-                return;
+            } catch (NumberFormatException ex) {
+                ioService.print("Invalid ID format: " + parts[0]);
             }
-        }
-
-
-        // Script mode : Handle multiple lines of input
-        String[] parts = arg.split("\\n");
-        if (parts.length != 11) {
-            ioService.print("Error: Need exactly 11 lines of data (ID + 10 parameters)");
             return;
         }
 
-        String idString = parts[0];
-        String[] inputs = Arrays.copyOfRange(parts, 1, 11);
-
+        // else script mode
         try {
-            int id = Integer.parseInt(idString);
+            int id = Integer.parseInt(parts[0].trim());
             Person existing = collectionManager.getById(id);
-
             if (existing == null) {
-                ioService.print("Person with ID " + id + " not found");
+                ioService.print("Person with ID: " + id + " not found");
                 return;
             }
-
-            // Validate all inputs
-            for (int i = 0; i < 10; i++) {
-                if (!Add.inputValidation(i, inputs[i], ioService)) {
-                    ioService.print("Validation failed for " + Add.INPUTS_LABELS[i]);
-                    return;
-                }
-            }
-
-            Person updated = parsePerson(inputs);
-
-            // Update the existing person's fields
-            existing.setName(updated.getName());
-            existing.setCoordinates(updated.getCoordinates());
-            existing.setHeight(updated.getHeight());
-            existing.setEyeColor(updated.getEyeColor());
-            existing.setHairColor(updated.getHairColor());
-            existing.setNationality(updated.getNationality());
-            existing.setLocation(updated.getLocation());
-            existing.setCreationDate(LocalDateTime.now());
-
-            ioService.print("Updated person ID " + id + ": " + existing.getName());
-
+            String[] fields = parts.length > INPUTS_LABELS.length + 1
+                    ? java.util.Arrays.copyOfRange(parts, 1, INPUTS_LABELS.length+1)
+                    : java.util.Arrays.copyOfRange(parts, 1, parts.length);
+            personIOService.updatePersonFromScript(existing, fields);
         } catch (NumberFormatException e) {
-            ioService.print("Invalid ID format: " + idString);
+            ioService.print("Invalid ID format: " + parts[0]);
         }
     }
 
-    private Person parsePerson(String[] parts) {
-        return new Person(
-                0, // ID is ignored (we use existing inputted ID)
-                parts[0].trim(),
-                new Coordinates(
-                        (int) Double.parseDouble(parts[1]),
-                        Double.parseDouble(parts[2])
-                ),
-                LocalDateTime.now(),
-                Double.parseDouble(parts[3]),
-                EyeColor.valueOf(parts[4].trim().toUpperCase()),
-                HairColor.valueOf(parts[5].trim().toUpperCase()),
-                Country.valueOf(parts[6].trim().toUpperCase()),
-                new Location(
-                        Float.parseFloat(parts[7]),
-                        Float.parseFloat(parts[8]),
-                        parts[9].trim()
-                )
-        );
+    @Override
+    public int scriptExecution(List<String> lines, int startIndex) {
+        List<String> parts = new ArrayList<>();
+        // include ID + up to 10 fields
+        for (int j = startIndex; j < lines.size() && parts.size() < INPUTS_LABELS.length + 1; j++) {
+            if (j == startIndex) {
+                parts.add(lines.get(j).split(" ", 2)[1].trim());
+            } else {
+                parts.add(lines.get(j).trim());
+            }
+        }
+        // delegate to execute(String)
+        execute(String.join("\n", parts));
+        return startIndex + parts.size();
+    }
+    @Override
+    public String getDescription() {
+        return DESCRIPTION;
     }
 }

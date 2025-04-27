@@ -9,6 +9,8 @@ import java.util.List;
 public class Show implements Command {
     private final CollectionManager collectionManager;
     private final IOService ioService;
+    public static final String DESCRIPTION = "show: print all elements of the collection to standard output";
+
 
     public Show(CollectionManager collectionManager, IOService ioService) {
         this.collectionManager = collectionManager;
@@ -23,11 +25,15 @@ public class Show implements Command {
             return;
         }
 
-        ioService.print("DISPLAYING THE COLLECTION DATA");
+        ioService.print("DISPLAYING THE COLLECTION DATA...");
         for (Person person : persons) {
             ioService.print(person.toString());
             ioService.print("");
         }
+    }
+    @Override
+    public String getDescription() {
+        return DESCRIPTION;
     }
 
 }

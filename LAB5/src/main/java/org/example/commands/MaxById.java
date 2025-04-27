@@ -7,6 +7,7 @@ import org.example.utils.IOService;
 public class MaxById implements Command {
     private final CollectionManager collectionManager;
     private final IOService ioService;
+    public static final String DESCRIPTION = "max_by_id: output any object from the collection whose id field value is maximum";
 
     public MaxById(CollectionManager collectionManager, IOService ioService) {
         this.collectionManager = collectionManager;
@@ -21,6 +22,10 @@ public class MaxById implements Command {
         } else {
             ioService.print("Collection is empty.");
         }
+    }
+    @Override
+    public String getDescription() {
+        return DESCRIPTION;
     }
 
 }

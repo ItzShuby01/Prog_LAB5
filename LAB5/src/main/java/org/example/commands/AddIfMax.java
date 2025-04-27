@@ -1,19 +1,23 @@
 package org.example.commands;
 
+import org.example.collection.Person;
 import org.example.utils.CollectionManager;
-import org.example.collection.*;
 import org.example.utils.IOService;
 import org.example.utils.PersonIOService;
+import java.util.ArrayList;
+import java.util.List;
 
-import java.time.LocalDateTime;
+import static org.example.utils.PersonIOService.INPUTS_LABELS;
 
-
-public class AddIfMax implements Command {
+public class AddIfMax implements Command, ScriptCommand {
     private final CollectionManager collectionManager;
     private final PersonIOService personIOService;
     private final IOService ioService;
+    public static final  String DESCRIPTION = "add_if_max {element}: add a new element to a collection if its value is greater than the value of the largest element in that collection";
 
-    public AddIfMax(CollectionManager collectionManager, PersonIOService personIOService, IOService ioService) {
+    public AddIfMax(CollectionManager collectionManager,
+                    PersonIOService personIOService,
+                    IOService ioService) {
         this.collectionManager = collectionManager;
         this.personIOService = personIOService;
         this.ioService = ioService;
@@ -21,65 +25,37 @@ public class AddIfMax implements Command {
 
     @Override
     public void execute() {
-        // 1) Interactive mode
-        ioService.print("Creating a new person to check if it's the max by height...");
-        Person newPerson = personIOService.readPerson();
-        checkAndAdd(newPerson);
+        ioService.print("Creating a new person to check max height...");
+        Person p = personIOService.readPerson();
+        checkAndAdd(p);
     }
 
     @Override
     public void execute(String arg) {
-        // 2)  Script mode
-        if (arg == null || arg.isEmpty()) {
-            execute(); // Fallback to interactive mode
+        if (arg == null || arg.isBlank()) {
+            execute();
             return;
         }
-
-        String[] parts = arg.split("\\n");
-        if (parts.length != 10) {
-            ioService.print("Error: Need exactly 10 lines of data");
-            return;
-        }
-
+        String[] parts = arg.split("\\R");
         try {
-            // Validate all parameters
-            for (int i = 0; i < 10; i++) {
-                if (!Add.inputValidation(i, parts[i], ioService)) {
-                    ioService.print("Validation failed for parameter " + Add.INPUTS_LABELS[i]);
-                    return;
-                }
-            }
-
-            // Parse inputs into a Person object
-            Person person = parsePerson(parts);
-            checkAndAdd(person);
-
-        } catch (NumberFormatException e) {
-            ioService.print("Invalid number format");
-        } catch (IllegalArgumentException e) {
-            ioService.print("Invalid value: " + e.getMessage());
+            Person p = personIOService.buildPersonFromScript(parts);
+            checkAndAdd(p);
+        } catch (Exception ex) {
+            ioService.print("Error processing script input: " + ex.getMessage());
         }
     }
 
-    private Person parsePerson(String[] parts) {
-        return new Person(
-                collectionManager.generateId(),
-                parts[0].trim(), // name
-                new Coordinates(
-                        (int) Double.parseDouble(parts[1]), // x
-                        Double.parseDouble(parts[2])       // y
-                ),
-                LocalDateTime.now(),
-                Double.parseDouble(parts[3]),          // height
-                EyeColor.valueOf(parts[4].trim().toUpperCase()), // eyeColor
-                HairColor.valueOf(parts[5].trim().toUpperCase()), // hairColor
-                Country.valueOf(parts[6].trim().toUpperCase()), // nationality
-                new Location(
-                        Float.parseFloat(parts[7]),       // locationX
-                        Float.parseFloat(parts[8]),       // locationY
-                        parts[9].trim()                   // locationName
-                )
-        );
+    @Override
+    public int scriptExecution(List<String> lines, int startIndex) {
+        List<String> parts = new ArrayList<>();
+        for (int j = startIndex + 1;
+             j < lines.size() && parts.size() < INPUTS_LABELS.length;
+             j++) {
+            parts.add(lines.get(j).trim());
+        }
+        Person p = personIOService.buildPersonFromScript(parts.toArray(new String[0]));
+        checkAndAdd(p);
+        return startIndex + 1 + parts.size();
     }
 
     private void checkAndAdd(Person newPerson) {
@@ -88,7 +64,12 @@ public class AddIfMax implements Command {
             collectionManager.add(newPerson);
             ioService.print("ADDED: " + newPerson.getName() + " as his height: " + "(" + newPerson.getHeight() + ")" + " > " +  "max height (" + currentMaxHeight + ")");
         } else {
-            ioService.print( newPerson.getName() + " NOT ADDED as his height: " + "(" + newPerson.getHeight() + ")" + " < " +  "max height (" + currentMaxHeight + ")");
+            ioService.print( newPerson.getName() + " NOT ADDED: " + newPerson.getName() + " as his height: " + "(" + newPerson.getHeight() + ")" + " ≤ " +  "max height (" + currentMaxHeight + ")");
         }
     }
+    @Override
+    public String getDescription() {
+        return DESCRIPTION;
+    }
 }
+

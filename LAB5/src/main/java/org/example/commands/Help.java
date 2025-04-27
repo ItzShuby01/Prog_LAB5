@@ -1,23 +1,26 @@
 package org.example.commands;
 
 import org.example.utils.CommandManager;
+import org.example.utils.IOService;
 
 public class Help implements Command {
     private final CommandManager commandManager;
+    private final IOService ioService; // Add IOService for consistent output
+    public static final String DESCRIPTION = "help: display help on available commands";
 
-
-
-    public Help(CommandManager commandManager) {
+    public Help(CommandManager commandManager, IOService ioService) {
         this.commandManager = commandManager;
+        this.ioService = ioService;
     }
 
     @Override
     public void execute() {
-        // Dynamically generate help message from the Commands descriptions in thr  CommandManager
-        StringBuilder manual = new StringBuilder();
-        commandManager.getCommandDescriptionMap().forEach((name, description) ->
-                manual.append(description).append("\n")
-        );
-        System.out.println(manual);
+        // Get descriptions from command instances via CommandManager
+        commandManager.getCommandDescriptions().values().forEach(ioService::print);
+    }
+
+    @Override
+    public String getDescription() {
+        return DESCRIPTION;
     }
 }

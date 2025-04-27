@@ -5,6 +5,7 @@ import org.example.utils.FileManager;
 
 public class Save implements Command {
     private final CollectionManager collectionManager;
+    public static final String DESCRIPTION = "save: save collection to file";
 
     public Save(CollectionManager collectionManager) {
         this.collectionManager = collectionManager;
@@ -19,5 +20,9 @@ public class Save implements Command {
             filePath = "storage.xml";
         }
         fileManager.saveCollectionToXml(filePath);
+    }
+    @Override
+    public String getDescription() {
+        return DESCRIPTION;
     }
 }

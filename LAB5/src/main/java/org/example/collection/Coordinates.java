@@ -1,11 +1,5 @@
 package org.example.collection;
 
-
-import jakarta.xml.bind.annotation.XmlAccessType;
-import jakarta.xml.bind.annotation.XmlAccessorType;
-
-@XmlAccessorType(XmlAccessType.FIELD)
-
 public class Coordinates {
     private Integer x; //Максимальное значение поля: 629, Поле не может быть null
     private double y;
