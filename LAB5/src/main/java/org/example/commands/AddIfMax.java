@@ -31,21 +31,6 @@ public class AddIfMax implements Command, ScriptCommand {
     }
 
     @Override
-    public void execute(String arg) {
-        if (arg == null || arg.isBlank()) {
-            execute();
-            return;
-        }
-        String[] parts = arg.split("\\R");
-        try {
-            Person p = personIOService.buildPersonFromScript(parts);
-            checkAndAdd(p);
-        } catch (Exception ex) {
-            ioService.print("Error processing script input: " + ex.getMessage());
-        }
-    }
-
-    @Override
     public int scriptExecution(List<String> lines, int startIndex) {
         List<String> parts = new ArrayList<>();
         for (int j = startIndex + 1;

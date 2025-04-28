@@ -33,24 +33,7 @@ public class Add implements Command, ScriptCommand {
             ioService.print("Failed to add person");
     }
 
-    // Single-arg mode
-    @Override
-    public void execute(String arg) {
-        if (arg == null || arg.isBlank()) {
-            execute(); // Fallback to interactive mode
-            return;
-        }
-        String[] parts = arg.split("\\R");
-        try {
-            Person p = personIOService.buildPersonFromScript(parts);
-            if (collectionManager.add(p))
-                ioService.print("Added: " + p.getName());
-            else
-                ioService.print("Failed to add: " + p.getName());
-        } catch (Exception e) {
-            ioService.print("Error processing script input: " + e.getMessage());
-        }
-    }
+
 
     // Script mode
     @Override
