@@ -20,20 +20,20 @@
     </person>
     <person>
         <id>1097394414</id>
-        <name>Ammut</name>
+        <name>Shanyu</name>
         <coordinates>
             <x>177</x>
             <y>20.0</y>
         </coordinates>
         <creationDate>2025-04-27T23:53:06.84979</creationDate>
-        <height>1002.0</height>
+        <height>10110.0</height>
         <eyeColor>RED</eyeColor>
         <hairColor>BLUE</hairColor>
         <nationality>ITALY</nationality>
         <location>
-            <x>78.0</x>
-            <y>89.0</y>
-            <name>ERDS</name>
+            <x>46.0</x>
+            <y>45.0</y>
+            <name>Moscow</name>
         </location>
     </person>
 </persons>

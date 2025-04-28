@@ -314,7 +314,6 @@ public class PersonIOService {
 
     public void updatePersonFromScript(Person person, String[] parts) {
         readPersonFromScript(parts, person);
-        ioService.print("Person with id " + person.getId() + " has been updated");
     }
 
 }
