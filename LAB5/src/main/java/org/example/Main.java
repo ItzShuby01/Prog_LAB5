@@ -2,7 +2,7 @@ package org.example;
 
 import org.example.utils.*;
 
-//UPLOAD TO HELIOS : LAB5 % scp -P 2222 target/java5-1.0-SNAPSHOT.jar s463221@se.ifmo.ru:~
+//UPLOAD TO HELIOS : scp -P 2222 target/java5-1.0-SNAPSHOT.jar s463221@se.ifmo.ru:~
 
 public class Main {
 //scp -P 2222 <путь до jar-архива> <твой логин>@se.ifmo.ru:~
