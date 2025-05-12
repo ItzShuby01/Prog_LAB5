@@ -19,7 +19,9 @@ public class Person implements Comparable<Person> {
 
   @XmlJavaTypeAdapter(LocalDateTimeAdapter.class)
   private LocalDateTime
-      creationDate; // Поле не может быть null, Значение этого поля должно генерироваться автоматически
+      creationDate; // Поле не может быть null, Значение этого поля должно генерироваться
+
+  // автоматически
 
   private double height; // Значение поля должно быть больше 0
   private EyeColor eyeColor; // Поле не может быть null
@@ -101,6 +103,7 @@ public class Person implements Comparable<Person> {
   public Country getNationality() {
     return nationality;
   }
+
   public void setNationality(Country nationality) {
     this.nationality = nationality;
   }
@@ -108,6 +111,7 @@ public class Person implements Comparable<Person> {
   public Location getLocation() {
     return location;
   }
+
   public void setLocation(Location location) {
     this.location = location;
   }

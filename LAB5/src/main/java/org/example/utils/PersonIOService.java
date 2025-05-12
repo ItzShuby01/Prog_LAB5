@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.stream.Stream;
-
 import org.example.collection.*;
 
 public class PersonIOService {
@@ -30,7 +29,7 @@ public class PersonIOService {
     Country nationality = readCountry();
     Location location = readLocation();
     return new Person(
-            id, name, coordinates, creationDate, height, eyeColor, hairColor, nationality, location);
+        id, name, coordinates, creationDate, height, eyeColor, hairColor, nationality, location);
   }
 
   private Coordinates readCoordinate() {
@@ -106,7 +105,7 @@ public class PersonIOService {
         return Country.valueOf(input.toUpperCase());
       } catch (IllegalArgumentException e) {
         ioService.print(
-                "Invalid input. Valid options are RUSSIA, GERMANY, ITALY, THAILAND, and JAPAN.");
+            "Invalid input. Valid options are RUSSIA, GERMANY, ITALY, THAILAND, and JAPAN.");
       }
     }
   }
@@ -118,33 +117,33 @@ public class PersonIOService {
         if (input.equalsIgnoreCase("n") || input.equalsIgnoreCase("no")) {
           return null; // Allow null for location
         } else if (input.equalsIgnoreCase("y") || input.equalsIgnoreCase("yes")) {
-    Location location = new Location();
-    boolean validInput = false;
-    while (!validInput) {
-      try {
-        ioService.print("Enter person location");
-        float parsedLocationX = (float) ioService.readDouble("x: ");
-        if (Float.isNaN(parsedLocationX) || Float.isInfinite(parsedLocationX)){
-          throw new Exception("Location X cannot be NaN/Infinity");
-        }
+          Location location = new Location();
+          boolean validInput = false;
+          while (!validInput) {
+            try {
+              ioService.print("Enter person location");
+              float parsedLocationX = (float) ioService.readDouble("x: ");
+              if (Float.isNaN(parsedLocationX) || Float.isInfinite(parsedLocationX)) {
+                throw new Exception("Location X cannot be NaN/Infinity");
+              }
 
-        float parsedLocationY = (float) ioService.readDouble("y: ");
-        if (Float.isNaN(parsedLocationY) || Float.isInfinite(parsedLocationY)){
-          throw new Exception("Location Y cannot be NaN/Infinity");
-        }
-        String name = ioService.readLine("name: ");
-        if (name.length() > 530) {
-          throw new Exception("Location name cannot exceed 530 characters");
-        }
-        location.setX(parsedLocationX);
-        location.setY(parsedLocationY);
-        location.setName(name);
-        validInput = true;
-      } catch (Exception e) {
-        ioService.print("Error: " + e.getMessage());
-      }
-    }
-    return location;
+              float parsedLocationY = (float) ioService.readDouble("y: ");
+              if (Float.isNaN(parsedLocationY) || Float.isInfinite(parsedLocationY)) {
+                throw new Exception("Location Y cannot be NaN/Infinity");
+              }
+              String name = ioService.readLine("name: ");
+              if (name.length() > 530) {
+                throw new Exception("Location name cannot exceed 530 characters");
+              }
+              location.setX(parsedLocationX);
+              location.setY(parsedLocationY);
+              location.setName(name);
+              validInput = true;
+            } catch (Exception e) {
+              ioService.print("Error: " + e.getMessage());
+            }
+          }
+          return location;
         } else {
           ioService.print("Please answer with 'y', 'yes', 'n', or 'no'.");
         }
@@ -155,33 +154,33 @@ public class PersonIOService {
   }
 
   public static final String[] INPUTS_LABELS = {
-          "name (string)",
-          "x (int)",
-          "y (double)",
-          "height (double)",
-          "eyeColor (valid : RED/BLACK/ORANGE)",
-          "hairColor (valid: GREEN/BLUE/YELLOW/BROWN)",
-          "nationality (valid: RUSSIA/GERMANY/ITALY/THAILAND/JAPAN)",
-          "locationX (float)",
-          "locationY (float)",
-          "locationName (string)"
+    "name (string)",
+    "x (int)",
+    "y (double)",
+    "height (double)",
+    "eyeColor (valid : RED/BLACK/ORANGE)",
+    "hairColor (valid: GREEN/BLUE/YELLOW/BROWN)",
+    "nationality (valid: RUSSIA/GERMANY/ITALY/THAILAND/JAPAN)",
+    "locationX (float)",
+    "locationY (float)",
+    "locationName (string)"
   };
 
   private static <T extends Enum<T>> boolean enumValidation(
-          Class<T> enumClass, String value, String fieldName, IOService ioService) {
+      Class<T> enumClass, String value, String fieldName, IOService ioService) {
     try {
       Enum.valueOf(enumClass, value.toUpperCase());
       return true;
     } catch (IllegalArgumentException e) {
       ioService.print(
-              "Invalid "
-                      + fieldName
-                      + ": "
-                      + "'"
-                      + value
-                      + "'"
-                      + ". Valid options: "
-                      + Arrays.toString(enumClass.getEnumConstants()));
+          "Invalid "
+              + fieldName
+              + ": "
+              + "'"
+              + value
+              + "'"
+              + ". Valid options: "
+              + Arrays.toString(enumClass.getEnumConstants()));
       return false;
     }
   }
@@ -234,10 +233,10 @@ public class PersonIOService {
           enumValidation(Country.class, value, "Nationality", ioService);
           yield true;
         }
-          case 7 -> {
-            if (value.trim().isEmpty()) {
-              yield true; // Allow empty input for location coordinate X
-            }
+        case 7 -> {
+          if (value.trim().isEmpty()) {
+            yield true; // Allow empty input for location coordinate X
+          }
           float parsedLocationX = Float.parseFloat(value);
           if (Float.isNaN(parsedLocationX) || Float.isInfinite(parsedLocationX)) {
             ioService.print("X coordinate cannot be NaN or Infinity");
@@ -297,40 +296,52 @@ public class PersonIOService {
     Location location = null;
 
     if (firstBad == -1) {
-      coordinates = new Coordinates(
+      coordinates =
+          new Coordinates(
               validateInt(Integer.parseInt(all[1])),
               validateDouble(Double.parseDouble(all[2]), "Coordinates Y"));
       height = validateDouble(Double.parseDouble(all[3]), "Height");
       eyeColor = EyeColor.valueOf(all[4].toUpperCase());
       hairColor = HairColor.valueOf(all[5].toUpperCase());
-      nationality = all[6] == null || all[6].trim().isEmpty() ? null : Country.valueOf(all[6].toUpperCase());
-      location = all[7] == null || all[8] == null || all[9] == null ||
-              Stream.of(all[7], all[8], all[9]).anyMatch(String::isBlank)
+      nationality =
+          all[6] == null || all[6].trim().isEmpty() ? null : Country.valueOf(all[6].toUpperCase());
+      location =
+          all[7] == null
+                  || all[8] == null
+                  || all[9] == null
+                  || Stream.of(all[7], all[8], all[9]).anyMatch(String::isBlank)
               ? null
               : new Location(
-              validateFloat(Float.parseFloat(all[7]), "Location X"),
-              validateFloat(Float.parseFloat(all[8]), "Location Y"),
-              validateString(all[9], "Location Name"));
+                  validateFloat(Float.parseFloat(all[7]), "Location X"),
+                  validateFloat(Float.parseFloat(all[8]), "Location Y"),
+                  validateString(all[9], "Location Name"));
     } else {
       // Handle partial failures by falling back to interactive input
       if (firstBad > 0) name = all[0];
       if (firstBad > 2)
-        coordinates = new Coordinates(
+        coordinates =
+            new Coordinates(
                 validateInt(Integer.parseInt(all[1])),
                 validateDouble(Double.parseDouble(all[2]), "Coordinates Y"));
       if (firstBad > 3) height = validateDouble(Double.parseDouble(all[3]), "Height");
       if (firstBad > 4) eyeColor = EyeColor.valueOf(all[4].toUpperCase());
       if (firstBad > 5) hairColor = HairColor.valueOf(all[5].toUpperCase());
       if (firstBad > 6)
-        nationality = all[6] == null || all[6].trim().isEmpty() ? null : Country.valueOf(all[6].toUpperCase());
+        nationality =
+            all[6] == null || all[6].trim().isEmpty()
+                ? null
+                : Country.valueOf(all[6].toUpperCase());
       if (firstBad == 9)
-        location = all[7] == null || all[8] == null || all[9] == null ||
-                Stream.of(all[7], all[8], all[9]).anyMatch(String::isBlank)
+        location =
+            all[7] == null
+                    || all[8] == null
+                    || all[9] == null
+                    || Stream.of(all[7], all[8], all[9]).anyMatch(String::isBlank)
                 ? null
                 : new Location(
-                validateFloat(Float.parseFloat(all[7]), "Location X"),
-                validateFloat(Float.parseFloat(all[8]), "Location Y"),
-                validateString(all[9], "Location Name"));
+                    validateFloat(Float.parseFloat(all[7]), "Location X"),
+                    validateFloat(Float.parseFloat(all[8]), "Location Y"),
+                    validateString(all[9], "Location Name"));
 
       for (int i = firstBad; i < F; i++) {
         switch (i) {
@@ -354,15 +365,15 @@ public class PersonIOService {
     // Create or update the person object
     if (target == null) {
       return new Person(
-              collectionManager.generateId(),
-              name,
-              coordinates,
-              LocalDateTime.now(),
-              height,
-              eyeColor,
-              hairColor,
-              nationality,
-              location);
+          collectionManager.generateId(),
+          name,
+          coordinates,
+          LocalDateTime.now(),
+          height,
+          eyeColor,
+          hairColor,
+          nationality,
+          location);
     } else {
       target.setName(name);
       target.setCoordinates(coordinates);
@@ -374,6 +385,7 @@ public class PersonIOService {
       return target;
     }
   }
+
   private double validateDouble(double value, String fieldName) {
     if (Double.isNaN(value) || Double.isInfinite(value)) {
       throw new IllegalArgumentException(fieldName + " cannot be NaN or Infinity");

@@ -17,7 +17,8 @@ public class CountByLocation implements Command {
   @Override
   public void execute(String arg) {
     int count = collectionManager.countByLocation(arg);
-    ioService.print("Number of persons with location '" + arg.toUpperCase().trim() + "' is " + count);
+    ioService.print(
+        "Number of persons with location '" + arg.toUpperCase().trim() + "' is " + count);
   }
 
   @Override
